@@ -1,8 +1,7 @@
 <?php
 session_start();
-
-if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
-    header("Location: ../../auth/login.php");
+if (!isset($_SESSION['officer_role']) || $_SESSION['officer_role'] != 'admin') {
+    header("Location: ../auth/login.php");
     exit;
 }
 
@@ -25,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     // cek username / email sudah ada
-    $check = $conn->prepare("SELECT id FROM users WHERE username=? OR email=?");
+    $check = $conn->prepare("SELECT id FROM officer WHERE username=? OR email=?");
     $check->bind_param("ss", $username, $email);
     $check->execute();
     $result = $check->get_result();
@@ -37,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // insert user
     $stmt = $conn->prepare("
-        INSERT INTO users (username,email,no_hp,password,role)
+        INSERT INTO officer (username,email,no_hp,password,role)
         VALUES (?,?,?,?,?)
     ");
 
@@ -45,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         "sssss",
         $username,
         $email,
-        $no_hp,
+        $no_hp  ,
         $hashedPassword,
         $role
     );

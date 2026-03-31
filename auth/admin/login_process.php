@@ -25,7 +25,7 @@ if ($user) {
         if ($user['role'] == 'admin') {
             header("Location: ../../admin/dashboard.php");
         } elseif ($user['role'] == 'petugas') {
-            header("Location: ../petugas/dashboard.php");
+            header("Location: ../../admin/dashboard.php");
         } else {
             header("Location: ../user/home.php");
         }

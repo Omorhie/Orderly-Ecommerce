@@ -1,6 +1,8 @@
 <?php
 session_start();
-if (!isset($_SESSION['officer_role']) || $_SESSION['officer_role'] != 'admin') {
+if (!isset($_SESSION['officer_role']) || 
+   !in_array($_SESSION['officer_role'], ['admin','petugas'])) {
+
     header("Location: ../auth/login.php");
     exit;
 }
@@ -133,39 +135,22 @@ $result = $conn->query("
                 font-weight: 540;
             }
 
-            .btn {
-                padding: 17px 12px;
-                text-decoration: none;
-                border-radius: 16px;
-                font-size: 18px;
-                display: inline-block;
-                width: 220px;
-                text-align: center;
-                font-weight: bold;
-                height: 55px;
-            }
-
-            .btn-add {
-                background: #D9D9D9;
-                color: #526D82;
-                transition: all 300ms;
-            }
-
-            .btn-add:hover{
-                background-color: #526D82;
-                color: #D9D9D9;
-                width: 250px;
-            }
-            .btn-edit {
-                background: #2563eb;
-                color: white;
-            }
-
             .btn-delete {
                 background: none;
                 color: #B61E1E;
                 text-decoration: none;
             } 
+
+    .confirm{
+    background:none;
+    color:#77D42F;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: none;
+            }
 
             table {
                 width: 100%;
@@ -216,12 +201,25 @@ $result = $conn->query("
     background:none;
     color:#77D42F;
     border:none;
-    padding:8px 12px;
     border-radius:8px;
     cursor:pointer;
     font-size: 16px;
     font-weight: bold;
 
+}
+
+.action-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* JARAK SAMA */
+    align-items: center;
+}
+
+/* Biar ukuran Confirmed sama kayak tombol */
+.confirm.fixed {
+    display: inline-block;
+    min-width: 70px;
+    text-align: center;
 }
 
 
@@ -373,6 +371,7 @@ $result = $conn->query("
     <th>Product Name</th>
     <th>Method</th>
     <th>Price</th>
+    <th>Status</th>
     <th>Proof Of Payment</th>
     <th>Action</th>
 </tr>
@@ -384,6 +383,19 @@ $result = $conn->query("
 <td><?= htmlspecialchars($row['product_name']) ?></td>
 <td><?= htmlspecialchars($row['method']) ?></td>
 <td>Rp <?= number_format($row['price']) ?></td>
+<td>
+<?php 
+$status = strtolower($row['status']);
+
+if($status == 'pending'){
+    echo "<span style='color:orange;'>Pending</span>";
+} elseif($status == 'confirmed'){
+    echo "<span style='color:#77D42F;'>Confirmed</span>";
+} else {
+    echo "<span>$status</span>";
+}
+?>
+</td>
 
 <td>
 <?php if($row['method'] == 'Transfer' && !empty($row['proof_payment'])): ?>
@@ -398,11 +410,33 @@ $result = $conn->query("
 </td>
 
 <td>
-<a href="delete.php?id=<?= $row['id'] ?>"
-onclick="return confirm('Hapus transaksi?')"
-class="btn-delete">
-Delete
-</a>
+<div class="action-group">
+
+<?php if($_SESSION['officer_role'] == 'petugas'): ?>
+    
+    <a href="delete.php?id=<?= $row['id'] ?>"
+    onclick="return confirm('Hapus transaksi?')"
+    class="btn-delete">
+    Delete
+    </a>
+
+    <?php if($row['status'] == 'Pending'): ?>
+        <a href="confirm.php?id=<?= $row['order_id'] ?>"
+        onclick="return confirm('Konfirmasi transaksi ini?')"
+        class="confirm">
+        Confirm
+        </a>
+    <?php else: ?>
+        <span class="confirm fixed">Confirmed</span>
+    <?php endif; ?>
+
+<?php endif; ?>
+
+<?php if($_SESSION['officer_role'] == 'admin'): ?>
+    <span style="color:#9DB2BF;">View Only</span>
+<?php endif; ?>
+
+</div>
 </td>
 
 </tr>

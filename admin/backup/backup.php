@@ -1,8 +1,7 @@
 <?php
 session_start();
-if (!isset($_SESSION['officer_role']) || $_SESSION['officer_role'] != 'admin') {
-    header("Location: ../auth/login.php");
-    exit;
+if ($_SESSION['officer_role'] != 'admin') {
+    die("Akses ditolak");
 }
 
 $backupDir = "backups/";

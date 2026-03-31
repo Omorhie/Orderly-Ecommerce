@@ -1,7 +1,9 @@
 <?php
 session_start();
 require_once "../../config/database.php";
-if (!isset($_SESSION['officer_role']) || $_SESSION['officer_role'] != 'admin') {
+if (!isset($_SESSION['officer_role']) || 
+   !in_array($_SESSION['officer_role'], ['admin','petugas'])) {
+
     header("Location: ../auth/login.php");
     exit;
 }

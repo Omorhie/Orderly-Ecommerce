@@ -1,8 +1,10 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['officer_role']) || $_SESSION['officer_role'] != 'admin') {
-    header("Location: ../../auth/login.php");
+if (!isset($_SESSION['officer_role']) || 
+   !in_array($_SESSION['officer_role'], ['admin','petugas'])) {
+
+    header("Location: ../auth/login.php");
     exit;
 }
 

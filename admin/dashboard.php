@@ -1,11 +1,14 @@
 <?php
 session_start();
-if (!isset($_SESSION['officer_role']) || $_SESSION['officer_role'] != 'admin') {
+if (!isset($_SESSION['officer_role']) || 
+   !in_array($_SESSION['officer_role'], ['admin','petugas'])) {
+
     header("Location: ../auth/login.php");
     exit;
 }
 
 require_once "../config/database.php";
+
 
 // total produk
 $qProduk = $conn->query("SELECT COUNT(*) AS total FROM products");

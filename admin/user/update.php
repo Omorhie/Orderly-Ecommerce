@@ -1,8 +1,8 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
-    header("Location: ../../auth/login.php");
+if (!isset($_SESSION['officer_role']) || $_SESSION['officer_role'] != 'admin') {
+    header("Location: ../auth/login.php");
     exit;
 }
 
@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $hashed = password_hash($password, PASSWORD_DEFAULT);
 
         $stmt = $conn->prepare("
-            UPDATE users 
+            UPDATE officer 
             SET username=?, email=?, no_hp=?, role=?, password=? 
             WHERE id=?
         ");
@@ -32,16 +32,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     } 
     // kalau password kosong → tidak update password
-    else{
+else{
 
-        $stmt = $conn->prepare("
-            UPDATE officer 
-            SET username=?, email=?, no_hp=?, role=? 
-            WHERE id=?
-        ");
+    $stmt = $conn->prepare("
+        UPDATE officer 
+        SET username=?, email=?, no_hp=?, role=? 
+        WHERE id=?
+    ");
 
-        $stmt->bind_param("ssssi", $username, $email, $no_hp, $role, $id);
-    }
+    $stmt->bind_param("ssssi", $username, $email, $no_hp, $role, $id);
+}
 
     // jalankan query
     if ($stmt->execute()) {
