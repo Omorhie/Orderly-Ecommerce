@@ -17,15 +17,17 @@ $query = mysqli_query($conn, "SELECT * FROM products ORDER BY created_at DESC");
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial, sans-serif;
+body{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
 }
 
-body{
-background:#f4f6f9;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
 }
 
 /* NAVBAR */
@@ -33,9 +35,10 @@ background:#f4f6f9;
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:20px 40px;
+padding:25px 50px;
 background:#0F2854;
 color:white;
+box-shadow:0 5px 20px rgba(0,0,0,0.2);
 }
 
 .logo{
@@ -79,30 +82,43 @@ color:#4988C4;
 width:90%;
 margin:20px auto 60px auto;
 overflow:hidden;
-border-radius:20px;
+border-radius:60px 60px 10px 10px;
 position:relative;
-height:400px;
+height:500px;
 box-shadow:0 20px 40px rgba(0,0,0,0.15);
 }
 
 .slides{
 display:flex;
-width:300%;
+width:100%;
 height:100%;
-animation:slide 12s infinite;
+transition: transform 0.6s ease-in-out;
 }
 
 .slides img{
 width:100%;
 height:100%;
 object-fit:cover;
+flex-shrink:0;
+object-position: center;
 }
 
 @keyframes slide{
-0%{transform:translateX(0);}
-33%{transform:translateX(-100%);}
-66%{transform:translateX(-200%);}
-100%{transform:translateX(0);}
+0%, 25%{
+    transform: translateX(0);
+}
+
+30%, 55%{
+    transform: translateX(-100%);
+}
+
+60%, 85%{
+    transform: translateX(-200%);
+}
+
+90%, 100%{
+    transform: translateX(0);
+}
 }
 
 .carousel-overlay{
@@ -190,6 +206,14 @@ font-weight:bold;
 color:#4988C4;
 margin:10px 0;
 font-size:16px;
+}
+
+.size{
+font-size:13px;
+background:rgba(73,136,196,0.2);
+padding:4px 10px;
+border-radius:20px;
+color:#fff;
 }
 
 .card-actions{
@@ -331,6 +355,31 @@ padding:4px 10px;
 border-radius:20px;
 color:#fff;
 }
+
+.info-section{
+max-width: 90%;
+margin:0 auto 30px auto;
+padding:30px;
+text-align:center;
+background:#0F2854;
+box-shadow:0 10px 30px rgba(0,0,0,0.1);
+border-radius: 10px 10px 60px 60px;
+}
+
+.info-section h2{
+color:#fff;
+margin-bottom:10px;
+}
+
+.info-section p{
+color:#fff;
+line-height:1.6;
+font-size:15px;
+}   
+
+.info-section span{
+    color: #4988C4;
+}
 </style>
 </head>
 
@@ -350,6 +399,10 @@ color:#fff;
         <a href="../auth/user/logout.php" class="icon-btn">
             <i data-lucide="log-out"></i>
         </a>
+
+        <a href="profile.php" class="icon-btn">
+            <i data-lucide="user-circle"></i>
+        </a>
     </div>
 </div>
 
@@ -359,11 +412,12 @@ color:#fff;
 
 <!-- CAROUSEL -->
 <div class="carousel">
-    <div class="slides">
-        <img src="https://picsum.photos/1200/400?random=1">
-        <img src="https://picsum.photos/1200/400?random=5">
-        <img src="https://picsum.photos/1200/400?random=6">
+    <div class="slides" id="slides">
+        <img src="../assets/1.jpg">
+        <img src="../assets/2.jpg">
+        <img src="../assets/3.jpg">
     </div>
+    
 
     <div class="carousel-overlay">
         <h2>Discover Your Style</h2>
@@ -388,13 +442,21 @@ color:#fff;
         Rp <?= number_format($row['price']); ?>
     </span>
 
-<span class="stock">
-    <?php if($row['stock'] > 0){ ?>
-        Stock: <?= $row['stock']; ?>
-    <?php } else { ?>
-        <span style="color:#ff4d4d;">Out of Stock</span>
-    <?php } ?>
-</span>
+    <div style="display:flex; gap:8px; align-items:center;">
+        <!-- SIZE -->
+        <span class="size">
+            Size: <?= htmlspecialchars($row['size']); ?>
+        </span>
+
+        <!-- STOCK -->
+        <span class="stock">
+            <?php if($row['stock'] > 0){ ?>
+                Stock: <?= $row['stock']; ?>
+            <?php } else { ?>
+                <span style="color:#ff4d4d;">Out of Stock</span>
+            <?php } ?>
+        </span>
+    </div>
 </div>
 
         <div class="card-actions">
@@ -415,6 +477,16 @@ color:#fff;
 
 <?php } ?>
 
+</div>
+
+<div class="info-section">
+    <h2>About Order<span>ly</span></h2>
+    <p>
+Orderly is a modern e-commerce platform dedicated to providing high-quality footwear for every lifestyle. From casual sneakers and stylish streetwear to formal shoes and performance sports footwear, we carefully curate our collection to meet the needs of every customer.
+We believe that the right pair of shoes can boost confidence and express personality. That’s why Orderly focuses not only on style, but also on comfort, durability, and affordability. Every product is selected to ensure it meets our standards of quality and design.
+Our mission is to deliver a seamless and enjoyable shopping experience. With an easy-to-use interface, secure transactions, and fast delivery, we make it simple for you to find and purchase your perfect pair of shoes anytime, anywhere.
+At Orderly, customer satisfaction is our top priority. We continuously strive to improve our service, expand our product range, and bring you the latest trends in the world of footwear.
+    </p>
 </div>
 
 <!-- FOOTER -->
@@ -470,6 +542,27 @@ document.querySelectorAll(".cart-form").forEach(form => {
     });
 
 });
+
+
+const slides = document.getElementById("slides");
+const totalSlides = slides.children.length;
+
+let index = 0;
+
+function showSlide(i){
+    slides.style.transform = `translateX(-${i * 100}%)`;
+}
+
+function nextSlide(){
+    index++;
+    if(index >= totalSlides){
+        index = 0;
+    }
+    showSlide(index);
+}
+
+// auto slide tiap 3 detik
+setInterval(nextSlide, 3000);
 </script>
 
 

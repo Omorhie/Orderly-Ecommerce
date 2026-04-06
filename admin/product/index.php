@@ -609,6 +609,7 @@ if (!isset($_SESSION['officer_role']) ||
                 <th class="desc-col">Description</th>
                 <th>Price</th>
                 <th>Stocks</th>
+                <th>Size</th> <!-- TAMBAHAN -->
                 <th>Picture</th>
                 <th>Action</th>
             </tr>
@@ -621,6 +622,7 @@ if (!isset($_SESSION['officer_role']) ||
                 </td>
                 <td>Rp <?= number_format($row['price']) ?></td>
                 <td><?= $row['stock'] ?></td>
+                <td><?= $row['size'] ?></td> <!-- TAMBAHAN -->
                 <td>
                     <?php if($row['image']) { ?>
                         <img src="../../uploads/products/<?= $row['image'] ?>">
@@ -631,11 +633,12 @@ if (!isset($_SESSION['officer_role']) ||
     <td class="actions">
         <button class="dot-btn"
             onclick="openEditModal(
-                '<?= $row['id'] ?>',
-                '<?= htmlspecialchars($row['name']) ?>',
-                '<?= $row['price'] ?>',
-                '<?= $row['stock'] ?>',
-                `<?= htmlspecialchars($row['description']) ?>`
+    '<?= $row['id'] ?>',
+    '<?= htmlspecialchars($row['name']) ?>',
+    '<?= $row['price'] ?>',
+    '<?= $row['stock'] ?>',
+    '<?= $row['size'] ?>',
+    `<?= htmlspecialchars($row['description']) ?>`
             )">
             ⋮
         </button>
@@ -680,6 +683,11 @@ if (!isset($_SESSION['officer_role']) ||
         <input type="number" name="stock" required>
         <label>Stock</label>
     </div>
+
+    <div class="form-group">
+    <input type="text" name="size" required>
+    <label>Size (ex: 40,41,42)</label>
+</div>
 
     <div class="form-group">
         <textarea name="description" rows="4" required></textarea>
@@ -742,6 +750,11 @@ if (!isset($_SESSION['officer_role']) ||
         <input type="number" name="stock" id="edit_stock" required>
         <label>Stock</label>
     </div>
+
+    <div class="form-group">
+    <input type="text" name="size" id="edit_size" required>
+    <label>Size</label>
+</div>
 
     <div class="form-group">
         <textarea name="description" id="edit_description" required></textarea>
@@ -808,15 +821,16 @@ if (!isset($_SESSION['officer_role']) ||
         this.style.height = this.scrollHeight + "px";
     });
 
-    function openEditModal(id, name, price, stock, description) {
-        document.getElementById("edit_id").value = id;
-        document.getElementById("edit_name").value = name;
-        document.getElementById("edit_price").value = price;
-        document.getElementById("edit_stock").value = stock;
-        document.getElementById("edit_description").value = description;
+function openEditModal(id, name, price, stock, size, description) {
+    document.getElementById("edit_id").value = id;
+    document.getElementById("edit_name").value = name;
+    document.getElementById("edit_price").value = price;
+    document.getElementById("edit_stock").value = stock;
+    document.getElementById("edit_size").value = size;
+    document.getElementById("edit_description").value = description;
 
-        document.getElementById("editModal").style.display = "block";
-    }
+    document.getElementById("editModal").style.display = "block";
+}
 
     function closeEditModal() {
         document.getElementById("editModal").style.display = "none";

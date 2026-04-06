@@ -58,34 +58,39 @@ body{
     color:#4988C4;
 }
 
-.nav-center{
+/* NAV CENTER */
+    .nav-center{
     display:flex;
     gap:40px;
-}
+    }
 
-.nav-center a{
+    .nav-center a{
     color:#4988C4;
     text-decoration:none;
     font-size:18px;
     transition:.3s;
-}
+    }
 
-.nav-center a:hover,
-.nav-center a.active{
+    .nav-center a:hover{
     color:#fff;
-    font-weight:bold;
-}
+    }
 
-.nav-right a{
+    /* NAV RIGHT */
+    .nav-right a{
     color:white;
     text-decoration:none;
     font-size:18px;
     transition:.3s;
-}
+    }
 
-.nav-right a:hover{
+    .nav-right a:hover{
     color:#4988C4;
-}
+    }
+
+    .nav-center a.active {
+        color: #fff;
+        font-weight: bold;
+    }
 
 /* CONTAINER */
 .container{

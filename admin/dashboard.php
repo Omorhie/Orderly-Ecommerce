@@ -9,6 +9,14 @@ if (!isset($_SESSION['officer_role']) ||
 
 require_once "../config/database.php";
 
+$qRecent = $conn->query("
+    SELECT transactions.*, users.username 
+    FROM transactions 
+    JOIN users ON transactions.user_id = users.id
+    ORDER BY transactions.id DESC
+    LIMIT 5
+");
+
 
 // total produk
 $qProduk = $conn->query("SELECT COUNT(*) AS total FROM products");
@@ -156,8 +164,8 @@ $totalTransaksi = $qTransaksi->fetch_assoc()['total'];
     transform: translateX(150px);
 }
 
-.card:hover{
-    height: 250px;
+.card:hover {
+    transform: translateX(150px) scale(1.05);
 }
 
 .card h3 {
@@ -173,6 +181,16 @@ $totalTransaksi = $qTransaksi->fetch_assoc()['total'];
     color: #27374D;
     font-weight: bold;
     text-align: center
+}
+
+
+.chart-container {
+    width: 600px;
+    margin: 40px auto;
+    background: #D9D9D9;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
 }
 
     </style>
@@ -204,6 +222,7 @@ $totalTransaksi = $qTransaksi->fetch_assoc()['total'];
 <div class="content">
     <div class="header">
         <p>Welcome, <span><?= $_SESSION['officer_username']; ?>!</span></p>
+        <p id="datetime"></p>
     </div>
 
    <div class="cards">
@@ -223,9 +242,74 @@ $totalTransaksi = $qTransaksi->fetch_assoc()['total'];
     </div>
 </div>
 
+<div class="chart-container">
+    <canvas id="myChart"></canvas>
+</div>
+
 
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </body>
+
+<script>
+function updateTime() {
+    const now = new Date();
+    document.getElementById("datetime").innerHTML = now.toLocaleString();
+}
+setInterval(updateTime, 1000);
+updateTime();
+
+
+
+const dataChart = {
+    labels: ['Produk', 'User', 'Transaksi'],
+    datasets: [{
+        label: 'Total Data',
+        data: [
+            <?= $totalProduk ?>,
+            <?= $totalUser ?>,
+            <?= $totalTransaksi ?>
+        ],
+        borderWidth: 1
+    }]
+};
+
+const config = {
+    type: 'pie', // bisa diganti: 'line', 'pie', 'doughnut'
+    data: dataChart,
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: true
+            }
+        }
+    }
+};
+
+
+datasets: [{
+    label: 'Total Data',
+    data: [
+        <?= $totalProduk ?>,
+        <?= $totalUser ?>,
+        <?= $totalTransaksi ?>
+    ],
+    backgroundColor: [
+        '#00E396',
+        '#0090FF',
+        '#FF4560'
+    ],
+    borderColor: '#ffffff',
+    borderWidth: 2
+}]
+
+const myChart = new Chart(
+    document.getElementById('myChart'),
+    config
+);
+</script>
 </html>

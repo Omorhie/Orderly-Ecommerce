@@ -94,6 +94,11 @@ button{
     border-radius:8px;
     cursor:pointer;
 }
+
+button a {
+    text-decoration: none;
+    color: #fff;
+}
 </style>
 </head>
 
@@ -133,6 +138,7 @@ Total: Rp <?= number_format($total) ?>
 </div>
 
 <button onclick="window.print()">Print</button>
+<button><a href="index.php">Back</a></button>
 
 </div>
 

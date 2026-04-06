@@ -14,6 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name        = mysqli_real_escape_string($conn, $_POST['name']);
     $price       = (int) $_POST['price'];
     $stock       = (int) $_POST['stock'];
+    $size        = mysqli_real_escape_string($conn, $_POST['size']); // ✅ TAMBAHAN
     $description = mysqli_real_escape_string($conn, $_POST['description']);
 
     $imageName = "";
@@ -23,22 +24,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $targetDir = "../../uploads/products/";
         
-        // Buat folder jika belum ada
         if (!is_dir($targetDir)) {
             mkdir($targetDir, 0777, true);
         }
 
-        $imageName = time() . "_" . basename($_FILES["image"]["name"]);
+$imageName = time() . "_" . $_FILES["image"]["name"];
+
+// bersihkan karakter berbahaya
+$imageName = preg_replace("/[^a-zA-Z0-9._-]/", "_", $imageName);
         $targetFile = $targetDir . $imageName;
 
         move_uploaded_file($_FILES["image"]["tmp_name"], $targetFile);
     }
 
-    // Insert ke database
-    $query = "INSERT INTO products (name, description, price, stock, image)
-              VALUES ('$name', '$description', '$price', '$stock', '$imageName')";
+    // ✅ QUERY SUDAH DIPERBAIKI
+$size = mysqli_real_escape_string($conn, $_POST['size']);
 
-    mysqli_query($conn, $query);
+$query = "INSERT INTO products (name, description, price, stock, size, image)
+VALUES ('$name', '$description', $price, $stock, '$size', '$imageName')";
+
+if(!mysqli_query($conn, $query)){
+    die("Error SQL: " . mysqli_error($conn));
+}
 
     header("Location: index.php");
     exit;

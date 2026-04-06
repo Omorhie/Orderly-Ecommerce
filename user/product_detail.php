@@ -90,7 +90,8 @@ position:relative;
 }
 
 .product-image img{
-width:100%;
+width:500px;
+height: 500px;
 border-radius:25px;
 box-shadow:0 30px 60px rgba(0,0,0,0.2);
 transition:.5s;
@@ -223,6 +224,15 @@ color:#fff;
 width:fit-content; /* supaya badge tidak full lebar */
 }
 
+.size{
+font-size:14px;
+padding:6px 14px;
+border-radius:20px;
+background:rgba(73,136,196,0.2);
+color:#fff;
+width:fit-content;
+}
+
 .btn-cart{
 width:100%;
 height:55px;
@@ -281,19 +291,25 @@ box-shadow:0 8px 20px rgba(225, 64, 46, 0.4);
         <p><?= htmlspecialchars($product['description']); ?></p>
 
 <div class="price-stock">
-<div class="price-stock">
     <div class="price">
         Rp <?= number_format($product['price']) ?>
     </div>
 
-    <div class="stock">
-        <?php if($product['stock'] > 0){ ?>
-            Stock: <?= $product['stock']; ?>
-        <?php } else { ?>
-            Out of Stock
-        <?php } ?>
+    <div style="display:flex; gap:10px; align-items:center;">
+        <!-- SIZE -->
+        <div class="size">
+            Size: <?= htmlspecialchars($product['size']); ?>
+        </div>
+
+        <!-- STOCK -->
+        <div class="stock">
+            <?php if($product['stock'] > 0){ ?>
+                Stock: <?= $product['stock']; ?>
+            <?php } else { ?>
+                Out of Stock
+            <?php } ?>
+        </div>
     </div>
-</div>
 </div>
 
         <form action="add_to_cart.php" method="POST" id="cart-form">

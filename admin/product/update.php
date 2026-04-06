@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once "../../config/database.php";
+
 if (!isset($_SESSION['officer_role']) || 
    !in_array($_SESSION['officer_role'], ['admin','petugas'])) {
 
@@ -14,6 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = mysqli_real_escape_string($conn, $_POST['name']);
     $price = intval($_POST['price']);
     $stock = intval($_POST['stock']);
+    $size = mysqli_real_escape_string($conn, $_POST['size']); // ✅ TAMBAHAN
     $description = mysqli_real_escape_string($conn, $_POST['description']);
 
     $imageQuery = "";
@@ -38,6 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
               name='$name',
               price='$price',
               stock='$stock',
+              size='$size', -- ✅ TAMBAHAN
               description='$description'
               $imageQuery
               WHERE id='$id'";
@@ -49,3 +52,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     header("Location: index.php");
     exit;
 }
+?>

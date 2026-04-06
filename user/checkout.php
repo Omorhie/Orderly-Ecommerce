@@ -337,6 +337,19 @@ $total = 0;
         color: #4988C4  ;
     }
 
+    .cod .confrim-btn {
+    color:white;
+    cursor:pointer;
+    transition:.3s;
+    background: none;
+    border: none;
+    font-size: 15px;
+    }
+
+    .cod .confirm-btn:hover{
+        color: #0F2854  ;
+    }
+
     /* OUTER BOX (abu besar) */
     /* OUTER CONTAINER */
   /* FILE UPLOAD MODERN */
@@ -345,6 +358,10 @@ $total = 0;
     align-items:center;
     gap:15px;
     margin-top:10px;
+}
+
+.cod .left {
+    color: #0F2854;
 }
 
 .file-upload input{
