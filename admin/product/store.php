@@ -40,8 +40,10 @@ $imageName = preg_replace("/[^a-zA-Z0-9._-]/", "_", $imageName);
     // ✅ QUERY SUDAH DIPERBAIKI
 $size = mysqli_real_escape_string($conn, $_POST['size']);
 
-$query = "INSERT INTO products (name, description, price, stock, size, image)
-VALUES ('$name', '$description', $price, $stock, '$size', '$imageName')";
+$brand = mysqli_real_escape_string($conn, $_POST['brand']);
+
+$query = "INSERT INTO products (name, brand, description, price, stock, size, image)
+VALUES ('$name', '$brand', '$description', '$price', '$stock', '$size', '$imageName')";
 
 if(!mysqli_query($conn, $query)){
     die("Error SQL: " . mysqli_error($conn));

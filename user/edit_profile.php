@@ -52,10 +52,6 @@ box-sizing:border-box;
 font-family:Arial, sans-serif;
 }
 
-body{
-background:linear-gradient(135deg,#eef2f7,#d9e2ec);
-}
-
 /* NAVBAR */
 .navbar{
 display:flex;

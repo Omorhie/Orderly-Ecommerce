@@ -35,8 +35,10 @@ if($total_price == 0){
     exit("Cart kosong");
 }
 
-$product_name_string = implode(", ", $product_names);
-
+$product_name_string = mysqli_real_escape_string(
+    $conn,
+    implode(", ", $product_names)
+);
 /* =========================
    INSERT KE ORDERS
 ========================= */
@@ -88,12 +90,22 @@ while($row = mysqli_fetch_assoc($cart)){
     $qty   = $row['qty'];
     $price = $row['price'] * $qty;
 
-    mysqli_query($conn, "
-        INSERT INTO transactions
-        (order_id, user_id, product_name, qty, price, proof_payment)
-        VALUES
-        ('$order_id','$user_id','$product_name','$qty','$price','$proofPath')
-    ");
+$stmt = $conn->prepare("
+    INSERT INTO transactions
+    (order_id, user_id, product_name, qty, price, proof_payment)
+    VALUES (?, ?, ?, ?, ?, ?)
+");
+
+$stmt->bind_param("iisiss",
+    $order_id,
+    $user_id,
+    $product_name,
+    $qty,
+    $price,
+    $proofPath
+);
+
+$stmt->execute();
 
     // Kurangi stok
     mysqli_query($conn, "

@@ -18,6 +18,46 @@ if(mysqli_num_rows($query) == 0){
 }
 
 $user = mysqli_fetch_assoc($query);
+
+$order_query = mysqli_query($conn, "
+    SELECT COUNT(DISTINCT order_id) as total_orders,
+           SUM(price) as total_spent
+    FROM transactions
+    WHERE user_id = $user_id
+");
+
+$order_data = mysqli_fetch_assoc($order_query);
+
+if(isset($_POST['change_password'])){
+
+    $current = $_POST['current_password'];
+    $new = $_POST['new_password'];
+    $confirm = $_POST['confirm_password'];
+
+    // Validasi password lama
+    if(!password_verify($current, $user['password'])){
+        echo "<script>alert('Current password salah');</script>";
+    }
+    // Validasi konfirmasi
+    elseif($new !== $confirm){
+        echo "<script>alert('Konfirmasi password tidak sama');</script>";
+    }
+    // Validasi panjang password
+    elseif(strlen($new) < 6){
+        echo "<script>alert('Password minimal 6 karakter');</script>";
+    }
+    else{
+        $new_hash = password_hash($new, PASSWORD_DEFAULT);
+
+        mysqli_query($conn, "
+            UPDATE users 
+            SET password = '$new_hash' 
+            WHERE id = $user_id
+        ");
+
+        echo "<script>alert('Password berhasil diubah'); window.location='profile.php';</script>";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -34,9 +74,6 @@ box-sizing:border-box;
 font-family:Arial, sans-serif;
 }
 
-body{
-background:linear-gradient(135deg,#eef2f7,#d9e2ec);
-}
 
 /* NAVBAR */
 .navbar{
@@ -104,6 +141,7 @@ color:white;
 border-radius:10px;
 text-decoration:none;
 transition:.3s;
+border-color: transparent;
 }
 
 .btn:hover{
@@ -122,6 +160,24 @@ color:#0F2854;
 
 <div class="container">
     <h2>My Profile</h2>
+
+    <div style="display:flex; justify-content:space-between; margin-bottom:25px; gap:15px;">
+    
+    <div style="flex:1; background:#4988C4; padding:15px; border-radius:10px; text-align:center;">
+        <div style="font-size:14px;">Total Orders</div>
+        <div style="font-size:20px; font-weight:bold;">
+            <?= $order_data['total_orders'] ?? 0 ?>
+        </div>
+    </div>
+
+    <div style="flex:1; background:#4988C4; padding:15px; border-radius:10px; text-align:center;">
+        <div style="font-size:14px;">Total Spent</div>
+        <div style="font-size:20px; font-weight:bold;">
+            Rp <?= number_format($order_data['total_spent'] ?? 0) ?>
+        </div>
+    </div>
+
+</div>
 
     <div class="profile-item">
         <div class="label">Username</div>
@@ -151,6 +207,32 @@ color:#0F2854;
     </div>
 
     <a href="edit_profile.php" class="btn">Edit Profile</a>
+    <h3 style="margin-top:30px;">Change Password</h3>
+
+<form method="POST" style="margin-top:15px;">
+    
+    <div class="profile-item">
+        <div class="label">Current Password</div>
+        <input type="password" name="current_password" required 
+        style="width:100%; padding:10px; border-radius:8px; border:none;">
+    </div>
+
+    <div class="profile-item">
+        <div class="label">New Password</div>
+        <input type="password" name="new_password" required 
+        style="width:100%; padding:10px; border-radius:8px; border:none;">
+    </div>
+
+    <div class="profile-item">
+        <div class="label">Confirm New Password</div>
+        <input type="password" name="confirm_password" required 
+        style="width:100%; padding:10px; border-radius:8px; border:none;">
+    </div>
+
+    <button type="submit" name="change_password" class="btn">
+        Update Password
+    </button>
+</form>
 </div>
 
 </body>

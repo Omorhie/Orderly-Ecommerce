@@ -7,7 +7,15 @@ if(!isset($_SESSION['username_user'])){
 }
 
 include '../config/database.php';
-$query = mysqli_query($conn, "SELECT * FROM products ORDER BY created_at DESC");
+$brandFilter = isset($_GET['brand']) ? mysqli_real_escape_string($conn, $_GET['brand']) : '';
+
+if($brandFilter){
+    $query = mysqli_query($conn, "SELECT * FROM products WHERE brand='$brandFilter' ORDER BY created_at DESC");
+} else {
+    $query = mysqli_query($conn, "SELECT * FROM products ORDER BY created_at DESC");
+}
+
+$brands = mysqli_query($conn, "SELECT DISTINCT brand FROM products");
 ?>
 
 <!DOCTYPE html>
@@ -142,6 +150,8 @@ color:#ddd;
 }
 
 /* ================= PRODUCT ================= */
+
+
 
 .product-container{
 max-width:1200px;
@@ -380,6 +390,31 @@ font-size:15px;
 .info-section span{
     color: #4988C4;
 }
+
+.brand-container{
+    display:flex;
+    gap:20px;
+    margin: auto;
+    margin-bottom: 60px;
+    flex-wrap:wrap;
+
+}
+
+.brand-card{
+    padding:15px 25px;
+    background:#0F2854;
+    color:#fff;
+    border-radius:30px;
+    cursor:pointer;
+    font-weight:600;
+    transition:.3s;
+    box-shadow:0 5px 15px rgba(0,0,0,0.15);
+}
+
+.brand-card:hover{
+    background:#4988C4;
+    transform:translateY(-5px);
+}
 </style>
 </head>
 
@@ -426,6 +461,20 @@ font-size:15px;
 </div>
 
 <!-- PRODUCTS -->
+
+<div class="brand-container">
+
+<div class="brand-card" onclick="filterBrand('')">All</div>
+
+<?php while($b = mysqli_fetch_assoc($brands)) { ?>
+    <div class="brand-card" onclick="filterBrand('<?= $b['brand']; ?>')">
+        <?= htmlspecialchars($b['brand']); ?>
+    </div>
+<?php } ?>
+
+</div>
+
+</div>
 <div class="product-container">
 
 <?php while($row = mysqli_fetch_assoc($query)) { ?>
@@ -563,6 +612,14 @@ function nextSlide(){
 
 // auto slide tiap 3 detik
 setInterval(nextSlide, 3000);
+
+function filterBrand(brand){
+    if(brand === ''){
+        window.location.href = "dashboard.php";
+    } else {
+        window.location.href = "dashboard.php?brand=" + brand;
+    }
+}
 </script>
 
 

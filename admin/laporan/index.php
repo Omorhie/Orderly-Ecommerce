@@ -36,6 +36,10 @@ $transaction = $conn->query("
 
 ?>
 
+<?php
+$role = $_SESSION['officer_role'];
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -271,10 +275,12 @@ $transaction = $conn->query("
         </a>
     </li>
 
-    <li><a href="../user/index.php">Officer Management</a></li>
     <li><a href="../transaksi/index.php">Transactions</a></li>
     <li><a href="../laporan/index.php" class="active">Report</a></li>
-    <li><a href="../backup/backup.php">Backup/Restore</a></li>
+        <?php if($role === 'admin') { ?>
+        <li><a href="../user/index.php">Officer Management</a></li>
+        <li><a href="../backup/backup.php">Backup/Restore</a></li>
+    <?php } ?>
     <li><a href="../../auth/admin/logout.php">Logout</a></li>
 </ul>
 

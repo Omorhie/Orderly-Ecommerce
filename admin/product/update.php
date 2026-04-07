@@ -16,6 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $price = intval($_POST['price']);
     $stock = intval($_POST['stock']);
     $size = mysqli_real_escape_string($conn, $_POST['size']); // ✅ TAMBAHAN
+        $brand = mysqli_real_escape_string($conn, $_POST['brand']); // ✅ TAMBAHAN
     $description = mysqli_real_escape_string($conn, $_POST['description']);
 
     $imageQuery = "";
@@ -36,8 +37,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
+
+
     $query = "UPDATE products SET
               name='$name',
+              brand='$brand',
               price='$price',
               stock='$stock',
               size='$size', -- ✅ TAMBAHAN

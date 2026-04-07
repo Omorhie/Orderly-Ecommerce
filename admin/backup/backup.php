@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set('Asia/Jakarta');
+
 session_start();
 if ($_SESSION['officer_role'] != 'admin') {
     die("Akses ditolak");
@@ -8,6 +10,10 @@ $backupDir = "backups/";
 
 // ambil semua file backup
 $files = glob($backupDir . "*.sql");
+?>
+
+<?php
+$role = $_SESSION['officer_role'];
 ?>
 
 <!DOCTYPE html>
@@ -307,10 +313,12 @@ th,td{
         </a>
     </li>
 
-    <li><a href="../user/index.php">Officer Management</a></li>
     <li><a href="../transaksi/index.php">Transactions</a></li>
     <li><a href="../laporan/index.php" >Report</a></li>
-    <li><a href="../backup/backup.php" class="active">Backup/Restore</a></li>
+        <?php if($role === 'admin') { ?>
+        <li><a href="../user/index.php">Officer Management</a></li>
+        <li><a href="../backup/backup.php" class="active">Backup/Restore</a></li>
+    <?php } ?>
     <li><a href="../../auth/admin/logout.php">Logout</a></li>
 </ul>
 

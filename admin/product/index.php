@@ -11,6 +11,10 @@ if (!isset($_SESSION['officer_role']) ||
     $result = $conn->query("SELECT * FROM products ORDER BY id DESC");
     ?>
 
+    <?php
+$role = $_SESSION['officer_role'];
+?>
+
     <!DOCTYPE html>
     <html>
     <head>
@@ -207,15 +211,35 @@ if (!isset($_SESSION['officer_role']) ||
         background: rgba(0,0,0,0.5);
     }
 
-    .modal-content {
-        background: #27374D;
-        width: 1000px;
-        margin: 3% auto;
-        padding: 0px 0px 30px 0px;
-        border-radius: 16px;
-        position: relative;
-        animation: fadeIn 0.3s ease;
-    }
+.modal-content {
+    background: #27374D;
+    width: 1000px;
+    max-height: 90vh;       /* ⬅️ BATASI TINGGI */
+    overflow-y: auto;       /* ⬅️ AKTIFKAN SCROLL */
+    margin: 3% auto;
+    padding: 0px 0px 30px 0px;
+    border-radius: 16px;
+    position: relative;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    scroll-behavior: smooth;
+}
+
+/* SCROLLBAR CUSTOM */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: #526D82;
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: transparent;
+}
 
     .close {
         position: absolute;
@@ -584,10 +608,12 @@ if (!isset($_SESSION['officer_role']) ||
         </a>
     </li>
 
-    <li><a href="../user/index.php">Officer Management</a></li>
     <li><a href="../transaksi/index.php">Transactions</a></li>
     <li><a href="../laporan/index.php">Report</a></li>
-    <li><a href="../backup/backup.php">Backup/Restore</a></li>
+        <?php if($role === 'admin') { ?>
+        <li><a href="../user/index.php">Officer Management</a></li>
+        <li><a href="../backup/backup.php">Backup/Restore</a></li>
+    <?php } ?>
     <li><a href="../../auth/admin/logout.php">Logout</a></li>
 </ul>
 
@@ -606,6 +632,7 @@ if (!isset($_SESSION['officer_role']) ||
         <table>
             <tr>
                 <th>Name Product</th>
+                <th>Brand</th>
                 <th class="desc-col">Description</th>
                 <th>Price</th>
                 <th>Stocks</th>
@@ -617,6 +644,7 @@ if (!isset($_SESSION['officer_role']) ||
             <?php while($row = $result->fetch_assoc()) { ?>
             <tr>
                 <td><?= htmlspecialchars($row['name']) ?></td>
+                <td><?= htmlspecialchars($row['brand']) ?></td>
                 <td class="desc-col" title="<?= htmlspecialchars($row['description']) ?>">
                  <?= htmlspecialchars($row['description']) ?>
                 </td>
@@ -631,17 +659,16 @@ if (!isset($_SESSION['officer_role']) ||
                     <?php } ?>
                 </td>
     <td class="actions">
-        <button class="dot-btn"
-            onclick="openEditModal(
-    '<?= $row['id'] ?>',
-    '<?= htmlspecialchars($row['name']) ?>',
-    '<?= $row['price'] ?>',
-    '<?= $row['stock'] ?>',
-    '<?= $row['size'] ?>',
-    `<?= htmlspecialchars($row['description']) ?>`
-            )">
-            ⋮
-        </button>
+<button class="dot-btn edit-btn"
+    data-id="<?= $row['id'] ?>"
+    data-name="<?= htmlspecialchars($row['name']) ?>"
+    data-brand="<?= htmlspecialchars($row['brand']) ?>"
+    data-price="<?= $row['price'] ?>"
+    data-stock="<?= $row['stock'] ?>"
+    data-size="<?= $row['size'] ?>"
+    data-description="<?= htmlspecialchars($row['description']) ?>">
+    ⋮
+</button>
     </td>
 
 
@@ -673,6 +700,11 @@ if (!isset($_SESSION['officer_role']) ||
         <input type="text" name="name" required>
         <label>Product Name</label>
     </div>
+
+    <div class="form-group">
+    <input type="text" name="brand" required>
+    <label>Brand</label>
+</div>
 
     <div class="form-group">
         <input type="number" name="price" required>
@@ -740,6 +772,11 @@ if (!isset($_SESSION['officer_role']) ||
         <input type="text" name="name" id="edit_name" required>
         <label>Product Name</label>
     </div>
+
+    <div class="form-group">
+    <input type="text" name="brand" id="edit_brand" required>
+    <label>Brand</label>
+</div>
 
     <div class="form-group">
         <input type="number" name="price" id="edit_price" required>
@@ -821,9 +858,10 @@ if (!isset($_SESSION['officer_role']) ||
         this.style.height = this.scrollHeight + "px";
     });
 
-function openEditModal(id, name, price, stock, size, description) {
+function openEditModal(id, name, brand, price, stock, size, description) {
     document.getElementById("edit_id").value = id;
     document.getElementById("edit_name").value = name;
+    document.getElementById("edit_brand").value = brand;
     document.getElementById("edit_price").value = price;
     document.getElementById("edit_stock").value = stock;
     document.getElementById("edit_size").value = size;
@@ -901,6 +939,21 @@ if(dropAreaEdit){
     });
 }
 
+
+document.querySelectorAll(".edit-btn").forEach(btn => {
+    btn.addEventListener("click", function(){
+
+        document.getElementById("edit_id").value = this.dataset.id;
+        document.getElementById("edit_name").value = this.dataset.name;
+        document.getElementById("edit_brand").value = this.dataset.brand;
+        document.getElementById("edit_price").value = this.dataset.price;
+        document.getElementById("edit_stock").value = this.dataset.stock;
+        document.getElementById("edit_size").value = this.dataset.size;
+        document.getElementById("edit_description").value = this.dataset.description;
+
+        document.getElementById("editModal").style.display = "block";
+    });
+});
 
 
 

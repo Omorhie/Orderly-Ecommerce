@@ -216,7 +216,7 @@ button{
         <div class="divider"></div>
 
         <div class="login-text">
-            Sudah punya akun? 
+            Have An Account?
             <a href="login.php">Login</a>
         </div>
 

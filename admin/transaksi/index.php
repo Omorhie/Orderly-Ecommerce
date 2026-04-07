@@ -22,6 +22,10 @@ $result = $conn->query("
 ");
 ?>
 
+<?php
+$role = $_SESSION['officer_role'];
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -345,10 +349,12 @@ $result = $conn->query("
         </a>
     </li>
 
-    <li><a href="../user/index.php">Officer Management</a></li>
     <li><a href="../transaksi/index.php" class="active">Transactions</a></li>
     <li><a href="../laporan/index.php">Report</a></li>
-    <li><a href="../backup/backup.php">Backup/Restore</a></li>
+        <?php if($role === 'admin') { ?>
+        <li><a href="../user/index.php">Officer Management</a></li>
+        <li><a href="../backup/backup.php">Backup/Restore</a></li>
+    <?php } ?>
     <li><a href="../../auth/admin/logout.php">Logout</a></li>
 </ul>
 
@@ -367,8 +373,9 @@ $result = $conn->query("
 
 <table>
 <tr>
-    <th>Customer</th>
-    <th>Product Name</th>
+<th>Order ID</th>
+<th>Customer</th>
+<th>Product Name</th>
     <th>Method</th>
     <th>Price</th>
     <th>Status</th>
@@ -379,6 +386,7 @@ $result = $conn->query("
 <?php while($row = $result->fetch_assoc()) { ?>
 <tr>
 
+<td>#ORD<?= $row['order_id'] ?></td>
 <td><?= htmlspecialchars($row['username']) ?></td>
 <td><?= htmlspecialchars($row['product_name']) ?></td>
 <td><?= htmlspecialchars($row['method']) ?></td>

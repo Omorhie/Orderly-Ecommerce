@@ -31,6 +31,10 @@ $qTransaksi = $conn->query("SELECT COUNT(*) AS total FROM transactions");
 $totalTransaksi = $qTransaksi->fetch_assoc()['total'];
 ?>
 
+<?php
+$role = $_SESSION['officer_role'];
+?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -209,10 +213,14 @@ $totalTransaksi = $qTransaksi->fetch_assoc()['total'];
         </a>
     </li>
 
-    <li><a href="user/index.php">Officer Management</a></li>
     <li><a href="transaksi/index.php">Transactions</a></li>
     <li><a href="laporan/index.php">Report</a></li>
-    <li><a href="backup/backup.php">Backup/Restore</a></li>
+
+    <?php if($role === 'admin') { ?>
+        <li><a href="user/index.php">Officer Management</a></li>
+        <li><a href="backup/backup.php">Backup/Restore</a></li>
+    <?php } ?>
+
     <li><a href="../auth/admin/logout.php">Logout</a></li>
 </ul>
 
@@ -278,7 +286,7 @@ const dataChart = {
 };
 
 const config = {
-    type: 'pie', // bisa diganti: 'line', 'pie', 'doughnut'
+    type: 'line', // bisa diganti: 'line', 'pie', 'doughnut'
     data: dataChart,
     options: {
         responsive: true,

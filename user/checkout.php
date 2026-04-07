@@ -10,6 +10,10 @@
 
 $user_id = $_SESSION['user_id'];
 
+$userQuery = mysqli_query($conn, "SELECT address FROM users WHERE id = $user_id");
+$userData = mysqli_fetch_assoc($userQuery);
+$address = $userData['address'] ?? '';
+
 $query = mysqli_query($conn, "
     SELECT cart.*, products.name, products.price, products.image
     FROM cart
@@ -598,7 +602,17 @@ Rp <?= number_format($row['price']); ?>
     </div>
 
     <script>
+        document.getElementById("checkoutForm").addEventListener("submit", function(e){
+    e.preventDefault(); // tahan submit
+
+    showSuccessPopup();
+
+    setTimeout(() => {
+        this.submit(); // lanjut submit setelah 1.5 detik
+    }, 1500);
+});
 let grandTotal = <?= $total ?>;
+let userAddress = "<?= htmlspecialchars($address) ?>";
 </script>
 
     <script>
@@ -616,7 +630,9 @@ document.getElementById("paymentContent").innerHTML = `
         <div class="form-row">
             <div class="address-box">
                 <label>Address</label>
-                <input type="text" name="address" required placeholder="Enter your address">
+                <input type="text" name="address" required 
+                value="${userAddress}" 
+                placeholder="Enter your address">
             </div>
 
             <div class="upload-box">
@@ -657,7 +673,9 @@ document.getElementById("paymentContent").innerHTML = `
 
     <div class="left">
         <label>Address</label>
-        <input type="text" name="address" required placeholder="Enter your address">
+        <input type="text" name="address" required 
+        value="${userAddress}" 
+        placeholder="Enter your address">
     </div>
 
     <div class="right">

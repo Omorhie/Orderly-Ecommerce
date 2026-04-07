@@ -8,6 +8,10 @@ require_once "../../config/database.php";
 $result = $conn->query("SELECT * FROM officer ORDER BY id DESC");
 ?>
 
+<?php
+$role = $_SESSION['officer_role'];
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -709,10 +713,12 @@ onclick="deleteUser()">Delete</button>
 <ul>
 <li><a href="../dashboard.php">Home</a></li>
 <li><a href="../product/index.php">Product Management</a></li>
-<li><a href="index.php" class="active">Officer Management</a></li>
 <li><a href="../transaksi/index.php">Transactions</a></li>
 <li><a href="../laporan/index.php">Report</a></li>
-<li><a href="../backup/backup.php">Backup/Restore</a></li>
+    <?php if($role === 'admin') { ?>
+        <li><a href="index.php" class="active">Officer Management</a></li>
+        <li><a href="../backup/backup.php">Backup/Restore</a></li>
+    <?php } ?>
 <li><a href="../../auth/admin/logout.php">Logout</a></li>
 </ul>
 </div>
