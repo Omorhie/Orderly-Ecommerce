@@ -7,10 +7,20 @@ if(!isset($_SESSION['user_id'])){
 }
 
 $user_id = $_SESSION['user_id'];
-$address = mysqli_real_escape_string($conn, $_POST['address']);
 $method  = $_POST['method'];
 
-$total_price = 0;
+$courier = isset($_POST['courier']) ? $_POST['courier'] : 'Unknown Courier';
+$shipping_service = isset($_POST['shipping_service']) ? $_POST['shipping_service'] : 'Regular';
+
+// Hitung ongkir
+$shipping_cost = ($shipping_service === 'Express') ? 35000 : 15000;
+
+// Sisipkan info pengiriman ke dalam string address supaya UI admin & history tidak rusak
+$raw_address = $_POST['address'];
+$full_address = $raw_address . " (Shipping: $courier - $shipping_service [Rp " . number_format($shipping_cost, 0, ',', '.') . "])";
+$address = mysqli_real_escape_string($conn, $full_address);
+
+$total_price = $shipping_cost; // Basis harganya dimulai dari ongkos kirim
 $product_names = [];
 
 /* =========================

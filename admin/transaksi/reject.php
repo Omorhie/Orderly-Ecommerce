@@ -9,20 +9,26 @@ require_once "../../config/database.php";
 
 if(isset($_GET['id'])){
 
-    $order_id = $_GET['id'];
+    $order_id = (int) $_GET['id'];
 
     $stmt = $conn->prepare("
         UPDATE orders 
-        SET status='Confirmed', delivery_status='Packaging'
+        SET status='Rejected' 
         WHERE id=?
     ");
 
     $stmt->bind_param("i", $order_id);
 
     if($stmt->execute()){
-        header("Location: index.php?success=confirmed");
-        exit;
+        echo "<script>
+            alert('Transaksi ditolak');
+            window.location='index.php';
+        </script>";
     } else {
-        echo "Gagal konfirmasi";
+        echo "<script>
+            alert('Gagal menolak transaksi');
+            window.location='index.php';
+        </script>";
     }
 }
+?>

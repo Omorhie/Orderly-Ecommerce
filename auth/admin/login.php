@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Login</title>
+<title>Admin Login - Orderly</title>
 
 <style>
 *{
@@ -18,12 +18,12 @@ body{
     flex-direction:column;
     justify-content:center;
     align-items:center;
-    background:#27374D;
+    background:#0f172a; /* Slate 900 */
 }
 
 /* TEXT ATAS */
 .welcome-text{
-    color:white;
+    color:#f8fafc; /* Slate 50 */
     font-size:32px;
     font-weight:bold;
     text-align: center;
@@ -35,39 +35,32 @@ body{
 }
 
 .welcome-text span{
-    color: #526D82;
-}
-
-/* LOGIN TITLE */
-.login-title{
-    color:#526D82;
-    font-size:50px;
-    margin-bottom:30px;
-    text-align: center;
-    margin-top: 30px;
+    color:#3b82f6; /* Blue 500 */
 }
 
 /* CONTAINER */
 .login-container{
-    background:#E6E6E6;
+    background:#1e293b; /* Slate 800 */
     padding:40px;
     border-radius:16px;
     width:400px;
     height: 550px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.2);
+    box-shadow:0 15px 35px rgba(0, 0, 0, 0.4);
     margin-top: 30px;
     transition: all 300ms;
-
 }
 
 .login-container:hover{
     transform:translateY(-5px);
 }
 
-/* LABEL */
-label{
-    font-weight:bold;
-    color:#27374D;
+/* LOGIN TITLE */
+.login-title{
+    color:#3b82f6;
+    font-size:50px;
+    margin-bottom:30px;
+    text-align: center;
+    margin-top: 30px;
 }
 
 /* INPUT */
@@ -77,22 +70,22 @@ input{
     margin-top:8px;
     margin-bottom:20px;
     border-radius:16px;
-    border:1px solid #ccc;
+    border:1px solid #475569; /* Slate 600 */
     outline:none;
 }
 
 /* INPUT FOCUS */
 input:focus{
-    border:1px solid #526D82;
+    border:1px solid #3b82f6;
 }
 
 /* BUTTON */
 button{
     width:100%;
     padding:14px;
-    border:2px solid #27374D;
+    border: 2px solid #3b82f6;
     border-radius:16px;
-    background:#27374D;
+    background:#3b82f6;
     color:white;
     font-size:16px;
     font-weight:bold;
@@ -102,9 +95,8 @@ button{
 
 button:hover{
     background:transparent;
-    border: 2px solid #27374D;
-    color: #27374D;
-
+    border: 2px solid #3b82f6;
+    color: #3b82f6;
 }
 
 /* FLOATING LABEL WRAPPER */
@@ -122,9 +114,10 @@ button{
     width:100%;
     padding:16px 12px;
     border-radius:16px;
-    border:1px solid #ccc;
+    border:1px solid #334155;
     outline:none;
-    background:white;
+    background:#0f172a;
+    color:#f8fafc;
     font-size:16px;
 }
 
@@ -135,7 +128,7 @@ button{
     top:42%;
     transform:translateY(-50%);
     padding:0 6px;
-    color:#929292;
+    color:#94a3b8; /* Slate 400 */
     font-size:12px;
     transition:0.25s ease;
     pointer-events:none;
@@ -147,21 +140,41 @@ button{
 .input-group input:not(:placeholder-shown) + label{
     top:0;
     font-size:12px;
-    color:#526D82;
+    color:#3b82f6;
+    background:#1e293b; /* Match container background */
 }
 
 /* BORDER SAAT FOCUS */
 .input-group input:focus{
-    border:1px solid #526D82;
+    border:1px solid #3b82f6;
 }
 
 /* GARIS BAWAH BUTTON */
 .divider{
     width:90%;
     height:4px;
-    background:#526D82;
+    background:#3b82f6;
     margin:30px auto 0 auto; /* center horizontal */
     border-radius:20px;
+}
+
+/* BACK TO SHOP TEXT */
+.signup-text{
+    text-align:center;
+    margin-top:25px;
+    font-size:14px;
+    color:#94a3b8;
+}
+
+.signup-text a{
+    color:#3b82f6;
+    text-decoration:none;
+    font-weight:bold;
+    transition:0.3s;
+}
+
+.signup-text a:hover{
+    color:#60a5fa;
 }
 </style>
 </head>
@@ -169,34 +182,38 @@ button{
 <body>
 
 <div class="welcome-text">
-<h1>Hello!</h1>
-<h3>Welcome To <span>Backend</span></h3>
+    <h1>Hello!</h1>
+    <h3>Welcome To <span>Orderly Backend</span></h3>
 </div>
-
-
 
 <div class="login-container">
-<div class="login-title">
-Login
-</div>
 
-<form action="login_process.php" method="POST">
+    <div class="login-title">
+        Login
+    </div>
 
-<div class="input-group">
-<input type="text" name="login" placeholder=" " required>
-<label>Username</label>
-</div>
+    <form action="login_process.php" method="POST">
 
-<div class="input-group">
-<input type="password" name="password" placeholder=" " required>
-<label>Password</label>
-</div>
+        <div class="input-group">
+            <input type="text" name="login" placeholder=" " required>
+            <label>Username</label>
+        </div>
 
-<button type="submit">Login</button>
+        <div class="input-group">
+            <input type="password" name="password" placeholder=" " required>
+            <label>Password</label>
+        </div>
 
-<div class="divider"></div>
+        <button type="submit">Login</button>
 
-</form>
+        <div class="divider"></div>
+
+        <div class="signup-text">
+            Not an Admin? 
+            <a href="../user/login.php">User Portal</a>
+        </div>
+
+    </form>
 
 </div>
 

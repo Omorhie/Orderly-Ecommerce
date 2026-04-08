@@ -18,12 +18,12 @@ body{
     flex-direction:column;
     justify-content:center;
     align-items:center;
-    background:#0F2854;
+    background:#f8fafc;
 }
 
 /* TEXT ATAS */
 .welcome-text{
-    color:white;
+    color:#0F2854;
     font-size:32px;
     font-weight:bold;
     text-align:center;
@@ -40,11 +40,11 @@ body{
 
 /* CONTAINER */
 .register-container{
-    background:#E6E6E6;
+    background:#ffffff;
     padding:40px;
     border-radius:16px;
     width:400px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.2);
+    box-shadow:0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
     margin-top:30px;
     transition:0.3s;
 }
@@ -113,9 +113,9 @@ button{
     width:100%;
     padding:16px 12px;
     border-radius:16px;
-    border:1px solid #ccc;
+    border:1px solid #e2e8f0;
     outline:none;
-    background:white;
+    background:#f8fafc;
     font-size:16px;
 }
 
@@ -160,7 +160,7 @@ button{
     text-align:center;
     margin-top:25px;
     font-size:14px;
-    color:#27374D;
+    color:#64748b;
 }
 
 .login-text a{

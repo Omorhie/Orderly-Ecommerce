@@ -39,285 +39,343 @@ $role = $_SESSION['officer_role'];
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard Admin</title>
+    <title>Dashboard Admin - Orderly</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        :root {
+            /* Admin Slate Palette */
+            --primary: #1e293b;
+            --secondary: #334155;
+            --accent: #3b82f6;
+            --bg-color: #f8fafc;
+            --sidebar-bg: #ffffff;
+            --text-dark: #0f172a;
+            --text-gray: #64748b;
+            --card-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            --transition: all 0.3s ease;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
         }
 
         body {
             display: flex;
             min-height: 100vh;
-            background-color: #27374D;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
         }
 
         /* SIDEBAR */
         .sidebar {
-            width: 250px;
-            background-color: #D9D9D9;
-            color: #fff;
-            padding-top: 50px;
-            padding-bottom: 20px;
-            border-radius: 0px 16px 16px 0px;
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            padding: 30px 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
         }
 
         .sidebar h2 {
             text-align: center;
-            margin-bottom: 30px;
-            font-size: 30px;
-            font-weight: 550;
-            color: #27374D;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .sidebar h2 span {
+            color: var(--accent);
         }
 
         .sidebar ul {
             list-style: none;
-            
-        }
-
-        .sidebar ul li {
-            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .sidebar ul li a {
             text-decoration: none;
-            color: #27374D;
-            display: block;
-            padding: 20px;
-            transition: 0.3s;
-            text-align: center;
-            font-size: 20px;
-            height: 60px;
-            font-weight: 540;
+            color: var(--text-gray);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: var(--transition);
         }
 
-        .sidebar a {
-            width: 100%;
+        .sidebar ul li a i {
+            width: 20px;
+            height: 20px;
         }
 
-        .sidebar ul li a:hover {
-            background-color: #27374D;
-            color: #fff;
-            height: 100px;
-            text-align: center;
-            padding-top: 40px;
+        .sidebar ul li a:hover, 
+        .sidebar ul li a.active {
+            background-color: var(--primary);
+            color: #ffffff;
+            transform: translateX(5px);
+            box-shadow: 0 10px 15px -3px rgba(30, 41, 59, 0.2);
         }
 
-                    .sidebar ul li a:hover {
-                background-color: #27374D;
-                color: #fff;
-                height: 100px;
-                text-align: center;
-                font-weight: bold;
-                padding-top: 40px;
-                width: 100%;
-            }
+        .sidebar ul li:last-child {
+            margin-top: auto; /* push logout to bottom */
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
 
-            /* ACTIVE SIDEBAR */
-.sidebar ul li a.active {
-    background-color: #27374D;
-    color: white;   
-    font-weight: bold;
-    height: 100px;
-    text-align: center;
-    padding-top: 40px
-}
+        .sidebar ul li:last-child a:hover {
+            background-color: #ef4444;
+            box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3);
+        }
 
         /* CONTENT */
         .content {
             flex: 1;
-            padding: 30px;
+            padding: 40px;
+            overflow-y: auto;
         }
 
         .header {
-            padding: 20px;
-            margin-bottom: 20px;
-            font-size: 36px;
-            color: #fff;
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            background: var(--sidebar-bg);
+            padding: 20px 30px;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
         }
 
-        .header p {
-            font-weight: 540;
+        .header-title p {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--primary);
         }
 
-        .header span {
-            color: #526D82;
+        .header-title span {
+            color: var(--accent);
         }
 
+        #datetime {
+            color: var(--text-gray);
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* METRIC CARDS */
         .cards {
-    display: flex;
-    gap: 20px;
-    align-items: stretch;
-}
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
 
+        .card {
+            background: var(--sidebar-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: var(--transition);
+        }
 
-.card {
-    width: 300px;
-    height: 200px;
-    background-color: #D9D9D9;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    transition: 0.3s;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    transform: translateX(150px);
-}
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
 
-.card:hover {
-    transform: translateX(150px) scale(1.05);
-}
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent);
+        }
 
-.card h3 {
-    font-size: 20px;
-    color: #64748b;
-    margin-bottom: 10px;
-    text-align: center;
-    font-weight: bold;
-}
+        .card-icon.products { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        .card-icon.users { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .card-icon.transactions { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
 
-.card .number {
-    font-size: 28px;
-    color: #27374D;
-    font-weight: bold;
-    text-align: center
-}
+        .card-info {
+            display: flex;
+            flex-direction: column;
+        }
 
+        .card-info h3 {
+            font-size: 15px;
+            color: var(--text-gray);
+            font-weight: 500;
+        }
 
-.chart-container {
-    width: 600px;
-    margin: 40px auto;
-    background: #D9D9D9;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-}
+        .card-info .number {
+            font-size: 28px;
+            color: var(--primary);
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        /* CHART */
+        .chart-container {
+            background: var(--sidebar-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            width: 100%;
+            height: 400px;
+        }
+
+        .chart-header {
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
     </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
-  <div class="sidebar">
-        <h2>Ordely</h2>
-<ul>
-    <li><a href="dashboard.php" class="active">Home</a></li>
-
-    <li>
-        <a href="product/index.php">
-            Product Management
-        </a>
-    </li>
-
-    <li><a href="transaksi/index.php">Transactions</a></li>
-    <li><a href="laporan/index.php">Report</a></li>
-
-    <?php if($role === 'admin') { ?>
-        <li><a href="user/index.php">Officer Management</a></li>
-        <li><a href="backup/backup.php">Backup/Restore</a></li>
-    <?php } ?>
-
-    <li><a href="../auth/admin/logout.php">Logout</a></li>
-</ul>
-
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h2><i data-lucide="shield-check"></i> Order<span>ly</span></h2>
+        <ul>
+            <li><a href="dashboard.php" class="active"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+            <li><a href="product/index.php"><i data-lucide="package"></i> Products</a></li>
+            <li><a href="transaksi/index.php"><i data-lucide="shopping-cart"></i> Transactions</a></li>
+            <li><a href="laporan/index.php"><i data-lucide="file-bar-chart"></i> Reports</a></li>
+            <?php if($role === 'admin') { ?>
+                <li><a href="user/index.php"><i data-lucide="users"></i> Officers</a></li>
+                <li><a href="backup/backup.php"><i data-lucide="database"></i> Backup</a></li>
+            <?php } ?>
+            <li><a href="chat_admin.php"><i data-lucide="message-square"></i> Support</a></li>
+            <li><a href="../auth/admin/logout.php"><i data-lucide="log-out"></i> Logout</a></li>
+        </ul>
     </div>
 
-<!-- CONTENT -->
-<div class="content">
-    <div class="header">
-        <p>Welcome, <span><?= $_SESSION['officer_username']; ?>!</span></p>
-        <p id="datetime"></p>
+    <!-- CONTENT -->
+    <div class="content">
+        <div class="header">
+            <div class="header-title">
+                <p>Welcome back, <span><?= $_SESSION['officer_username']; ?>!</span></p>
+            </div>
+            <div id="datetime"><i data-lucide="clock"></i> <span></span></div>
+        </div>
+
+        <div class="cards">
+            <div class="card">
+                <div class="card-icon products">
+                    <i data-lucide="box" style="width: 28px; height: 28px;"></i>
+                </div>
+                <div class="card-info">
+                    <h3>Total Products</h3>
+                    <div class="number"><?= $totalProduk ?></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon users">
+                    <i data-lucide="users" style="width: 28px; height: 28px;"></i>
+                </div>
+                <div class="card-info">
+                    <h3>Total Officers</h3>
+                    <div class="number"><?= $totalUser ?></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon transactions">
+                    <i data-lucide="activity" style="width: 28px; height: 28px;"></i>
+                </div>
+                <div class="card-info">
+                    <h3>Total Transactions</h3>
+                    <div class="number"><?= $totalTransaksi ?></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-header">
+                <i data-lucide="bar-chart-2"></i> System Metrics Overview
+            </div>
+            <canvas id="myChart"></canvas>
+        </div>
     </div>
 
-   <div class="cards">
-    <div class="card">
-        <h3>Total Produk</h3>
-        <div class="number"><?= $totalProduk?></div>
-    </div>
+    <script>
+        // Init Icons
+        lucide.createIcons();
 
-    <div class="card">
-        <h3>Total User</h3>
-        <div class="number"><?= $totalUser?></div>
-    </div>
-
-    <div class="card">
-        <h3>Total Transaksi</h3>
-        <div class="number"><?= $totalTransaksi?></div>
-    </div>
-</div>
-
-<div class="chart-container">
-    <canvas id="myChart"></canvas>
-</div>
-
-
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-</body>
-
-<script>
-function updateTime() {
-    const now = new Date();
-    document.getElementById("datetime").innerHTML = now.toLocaleString();
-}
-setInterval(updateTime, 1000);
-updateTime();
-
-
-
-const dataChart = {
-    labels: ['Produk', 'User', 'Transaksi'],
-    datasets: [{
-        label: 'Total Data',
-        data: [
-            <?= $totalProduk ?>,
-            <?= $totalUser ?>,
-            <?= $totalTransaksi ?>
-        ],
-        borderWidth: 1
-    }]
-};
-
-const config = {
-    type: 'line', // bisa diganti: 'line', 'pie', 'doughnut'
-    data: dataChart,
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                display: true
-            }
+        // Time Updates
+        function updateTime() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            document.querySelector("#datetime span").innerHTML = now.toLocaleDateString('en-US', options);
         }
-    }
-};
+        setInterval(updateTime, 1000);
+        updateTime();
 
-
-datasets: [{
-    label: 'Total Data',
-    data: [
-        <?= $totalProduk ?>,
-        <?= $totalUser ?>,
-        <?= $totalTransaksi ?>
-    ],
-    backgroundColor: [
-        '#00E396',
-        '#0090FF',
-        '#FF4560'
-    ],
-    borderColor: '#ffffff',
-    borderWidth: 2
-}]
-
-const myChart = new Chart(
-    document.getElementById('myChart'),
-    config
-);
-</script>
+        // Chart Data
+        const ctx = document.getElementById('myChart');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Products', 'Officers', 'Transactions'],
+                datasets: [{
+                    label: 'System Data',
+                    data: [<?= $totalProduk ?>, <?= $totalUser ?>, <?= $totalTransaksi ?>],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(245, 158, 11, 0.8)'
+                    ],
+                    borderRadius: 8,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#f1f5f9' },
+                        border: { display: false }
+                    },
+                    x: {
+                        grid: { display: false },
+                        border: { display: false }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
 </html>

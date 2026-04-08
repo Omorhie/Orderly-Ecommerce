@@ -1,963 +1,815 @@
-    <?php
-    session_start();
+<?php
+session_start();
 if (!isset($_SESSION['officer_role']) || 
    !in_array($_SESSION['officer_role'], ['admin','petugas'])) {
 
-    header("Location: ../auth/login.php");
+    header("Location: ../../auth/login.php");
     exit;
 }
 
-    require_once "../../config/database.php";
-    $result = $conn->query("SELECT * FROM products ORDER BY id DESC");
-    ?>
-
-    <?php
+require_once "../../config/database.php";
+$result = $conn->query("SELECT * FROM products ORDER BY id DESC");
 $role = $_SESSION['officer_role'];
 ?>
 
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Manajemen Produk</title>
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-                font-family: Arial, sans-serif;
-            }
-
-            body {
-                display: flex;
-                min-height: 100vh;
-                background-color: #27374D;
-            }
-
-            /* SIDEBAR */
-            .sidebar {
-                width: 250px;
-                background-color: #D9D9D9;
-                color: #fff;
-                padding-top: 50px;
-                padding-bottom: 20px;
-                border-radius: 0px 16px 16px 0px;
-            }
-
-            .sidebar h2 {
-                text-align: center;
-                margin-bottom: 30px;
-                font-size: 30px;
-                font-weight: 550;
-                color: #27374D;
-            }
-
-            .sidebar ul {
-                list-style: none;
-                
-            }
-
-            .sidebar ul li {
-                margin-bottom: 15px;
-            }
-
-            .sidebar ul li a {
-                text-decoration: none;
-                color: #27374D;
-                display: block;
-                padding: 20px;
-                transition: 0.3s;
-                text-align: center;
-                font-size: 20px;
-                height: 60px;
-                font-weight: 540;
-            }
-
-            .sidebar a {
-                width: 100%;
-            }
-
-            .sidebar ul li a:hover {
-                background-color: #27374D;
-                color: #fff;
-                height: 100px;
-                text-align: center;
-                    font-weight: bold;
-                padding-top: 40px;
-            }
-
-            /* ACTIVE SIDEBAR */
-.sidebar ul li a.active {
-    background-color: #27374D;
-    color: white;   
-    font-weight: bold;
-    height: 100px;
-    text-align: center;
-    padding-top: 40px
-}
-
-
-
-            /* CONTENT */
-            .content {
-                flex: 1;
-                padding: 30px;
-            }
-
-            .header {
-                padding-top: 10px;
-                margin-bottom: 20px;
-                font-size: 25px;
-                color: #fff;
-                justify-content: space-between;
-                display: flex;
-            }
-
-            .header span {
-                color: #526D82;
-            }
-
-            .header h2  {
-                padding-top: 10px;
-                font-weight: 540;
-            }
-
-            .btn {
-                padding: 15px 12px;
-                text-decoration: none;
-                border-radius: 16px;
-                font-size: 18px;
-                display: inline-block;
-                width: 220px;
-                text-align: center;
-                font-weight: bold;
-                height: 55px;
-                border: none;
-            }
-
-            .btn-add {
-                background: #D9D9D9;
-                color: #526D82;
-                transition: all 300ms;
-            }
-
-            .btn-add:hover{
-                background-color: #526D82;
-                color: #D9D9D9;
-                width: 250px;
-            }
-            .btn-edit {
-                background: #2563eb;
-                color: white;
-            }
-
-            .btn-delete {
-                background: #dc2626;
-                color: white;
-            } 
-
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                background: white;
-                border-radius: 16px;
-                overflow: hidden;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-            }
-
-
-            th, td {
-                padding: 12px;
-                border-bottom: 1px solid #bdbdbd;
-                text-align: center;
-                background-color: #D9D9D9;
-                color: #526D82;
-            }
-
-            td {
-                border-right: 1px solid #bdbdbd;
-                font-weight: bold;
-            }
-
-            th {
-                background: #D9D9D9;
-                color: #526D82;
-                height: 50px;
-                font-weight: bold;
-                text-align: center;
-                font-size: 19px;
-
-            }
-
-            img {
-                width: 60px;
-                height: 60px;
-                object-fit: cover;
-                border-radius: 5px;
-            }
-
-            .actions a {
-                margin-right: 5px;
-            }
-
-            /* MODAL */
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 999;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.5);
-    }
-
-.modal-content {
-    background: #27374D;
-    width: 1000px;
-    max-height: 90vh;       /* ⬅️ BATASI TINGGI */
-    overflow-y: auto;       /* ⬅️ AKTIFKAN SCROLL */
-    margin: 3% auto;
-    padding: 0px 0px 30px 0px;
-    border-radius: 16px;
-    position: relative;
-    animation: fadeIn 0.3s ease;
-}
-
-.modal-content {
-    scroll-behavior: smooth;
-}
-
-/* SCROLLBAR CUSTOM */
-.modal-content::-webkit-scrollbar {
-    width: 8px;
-}
-
-.modal-content::-webkit-scrollbar-thumb {
-    background: #526D82;
-    border-radius: 10px;
-}
-
-.modal-content::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-    .close {
-        position: absolute;
-        right: 20px;
-        top: 15px;
-        font-size: 30px;
-        cursor: pointer;
-        color: #526D82;
-    }
-
-    /* FORM GROUP */
-    .form-group {
-        margin-bottom: 20px;
-        position: relative;
-    }
-
-    /* INPUT STYLE */
-    .form-group input,
-    .form-group textarea {
-        width: 80%; /* Dipendekkan */
-        padding: 15px 20px;
-        border-radius: 14px;
-        border: 1px solid #ccc;
-        font-size: 15px;
-        background-color: #d9d9d9;
-        color: #526D82; /* Warna teks */
-        transition: all 0.3s ease;
-    }
-
-    /* FLOATING EFFECT */
-    .form-group input:focus,
-    .form-group textarea:focus {
-        outline: none;
-        transform: translateY(-5px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        border-color: #27374D;
-    }
-
-    /* Placeholder style */
-    .form-group input::placeholder,
-    .form-group textarea::placeholder {
-        color: #526D82;
-        opacity: 0.7;
-    }
-
-    /* HILANGKAN SCROLL INPUT */
-    .form-group input {
-        overflow: hidden;
-    }
-
-    /* KHUSUS TEXTAREA */
-    .form-group textarea {
-        resize: none;         
-        /* overflow: hidden;     */
-        min-height: 120px;     /* Tinggi tetap */
-    }
-
-
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .modal-grid {
-        display: flex;
-        gap: 30px;
-    }
-
-    .left-form {
-        flex: 2;
-    }
-
-    .right-form {
-        flex: 1;
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
-    }
-
-    .right-form input[type="file"] {
-        background: #D9D9D9;
-        padding: 10px 20px;
-        border-radius: 16px;
-        cursor: pointer;
-    }
-
-    /* NAVBAR MODAL */
-    .modal-navbar {
-        background: #D9D9D9;
-        color: white;
-        padding: 15px;
-        border-radius: 16px 16px 0px 0px;
-        width: 100%;
-        margin-bottom: 50px;
-        height: 60px;
-    }
-
-    .modal-navbar h3 {
-        margin: 0;
-        color: #526D82;
-        padding-top: 2px;
-        padding-left: 15px;
-        font-size: 25px;
-    }
-
-    //* FORM GROUP */
-    .form-group {
-        position: relative;
-        margin-bottom: 30px;
-    }
-
-    /* GLASS INPUT */
-    .form-group input,
-    .form-group textarea {
-        width: 100%;
-        padding: 20px 15px;
-        border-radius: 14px;
-        border: 1px solid rgba(255,255,255,0.2);
-        background: rgba(255,255,255,0.08);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        font-size: 15px;
-        color: #D9D9D9;
-        outline: none;
-        transition: all 0.3s ease;
-    }
-
-    /* FLOAT EFFECT */
-    .form-group input:focus,
-    .form-group textarea:focus {
-        border-color: #526D82;
-        box-shadow: 0 0 15px #526D82;
-    }
-
-    /* FLOATING LABEL */
-    .form-group label {
-        position: absolute;
-        left: 15px;
-        top: 18px;
-        color: #526D82;
-        font-size: 14px;
-        pointer-events: none;
-        transition: 0.3s ease;
-        background: transparent;
-    }
-
-    /* Label naik saat focus / ada isi */
-    .form-group input:focus + label,
-    .form-group input:valid + label,
-    .form-group textarea:focus + label,
-    .form-group textarea:valid + label {
-        top: -10px;
-        left: 12px;
-        font-size: 12px;
-        color: #D9D9D9;
-        background: #526D82;
-        padding: 0 6px;
-        border-radius: 6px;
-    }
-
-
-    /* UPLOAD BOX */
-    .upload-box {
-        width: 100%;
-        height: 200px;
-        border-radius: 20px;
-        background: rgba(255,255,255,0.08);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255,255,255,0.2);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: 0.3s ease;
-    }
-
-    .upload-box:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    }
-
-
-    .left-form{
-        padding-left: 30px;
-    }
-
-    .right-form{
-        padding-right: 30px;
-    }
-
-    /* MODAL FOOTER */
-    .modal-footer {
-        display: flex;
-        justify-content: flex-end;
-        gap: 0;
-        padding: 20px 30px;
-    }
-
-
-    /* SAVE BUTTON STYLE */
-    .btn-save {
-        background: none;
-        color: #77D42F;
-        border: none;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    /* FLOATING ANIMATION */
-    .btn-save:hover {
-        color: #D9D9D9;
-    }
-
-    .btn-save {
-        animation: floatIn 0.4s ease;
-    }
-
-    @keyframes floatIn {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Management - Orderly Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            /* Admin Slate Palette */
+            --primary: #1e293b;
+            --secondary: #334155;
+            --accent: #3b82f6;
+            --bg-color: #f8fafc;
+            --sidebar-bg: #ffffff;
+            --text-dark: #0f172a;
+            --text-gray: #64748b;
+            --card-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            --transition: all 0.3s ease;
         }
-        to {
-            opacity: 1;
-            transform: translateY(0);
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
         }
-    }
 
-    /* HILANGKAN SPINNER NUMBER INPUT */
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+        }
 
-    /* Chrome, Safari, Edge */
-    input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
+        /* SIDEBAR */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            padding: 30px 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
 
-    /* Firefox */
-    input[type=number] {
-        -moz-appearance: textfield;
-    }
+        .sidebar h2 {
+            text-align: center;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
 
-    /* DROPDOWN TRIPLE DOT */
-    .dropdown {
-        position: relative;
-        display: inline-block;
-    }
+        .sidebar h2 span {
+            color: var(--accent);
+        }
 
-    .dot-btn {
-        background: none;
-        border: none;
-        font-size: 22px;
-        cursor: pointer;
-        color: #526D82;
-    }
+        .sidebar ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
 
-    .dropdown-content {
-        display: none;
-        position: absolute;
-        right: 0;
-        background: white;
-        min-width: 120px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        border-radius: 10px;
-        overflow: hidden;
-        z-index: 999;
-    }
+        .sidebar ul li a {
+            text-decoration: none;
+            color: var(--text-gray);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
 
-    .dropdown-content button,
-    .dropdown-content a {
-        width: 100%;
-        padding: 12px;
-        border: none;
-        background: none;
-        text-align: left;
-        cursor: pointer;
-        display: block;
-        color: #526D82;
-        text-decoration: none;
-    }
+        .sidebar ul li a i {
+            width: 20px;
+            height: 20px;
+        }
 
-    .dropdown-content button:hover,
-    .dropdown-content a:hover {
-        background: #f1f5f9;
-    }
+        .sidebar ul li a:hover, 
+        .sidebar ul li a.active {
+            background-color: var(--primary);
+            color: #ffffff;
+            transform: translateX(5px);
+            box-shadow: 0 10px 15px -3px rgba(30, 41, 59, 0.2);
+        }
 
-    .dropdown:hover .dropdown-content {
-        display: block;
-    }
+        .sidebar ul li:last-child {
+            margin-top: auto; 
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
 
-    .dot-btn {
-        background: none;
-        border: none;
-        font-size: 24px;
-        cursor: pointer;
-        color: #526D82;
-        transition: 0.2s;
-    }
+        .sidebar ul li:last-child a:hover {
+            background-color: #ef4444;
+            box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3);
+        }
 
-    .btn-delete {
-        background: none;
-        color: #B61E1E;
-        border: none;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
+        /* CONTENT */
+        .content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            position: relative;
+        }
 
-    .btn-delete:hover {
-        color: #d9d9d9;
-    }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: var(--sidebar-bg);
+            padding: 20px 30px;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+        }
 
-    .modal-footer .btn {
-        width: auto;
-        padding: 12px 25px;
-    }
+        .header h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--primary);
+        }
 
-    .upload-box {
-    width: 100%;
-    height: 200px;
-    border-radius: 20px;
-    border: 2px dashed rgba(255,255,255,0.3);
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(12px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: 0.3s ease;
-    color: #D9D9D9;
-    text-align: center;
-}
+        .btn-add {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
+        }
 
-.upload-box:hover {
-    border-color: #526D82;
-    transform: translateY(-5px);
-}
+        .btn-add:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(59, 130, 246, 0.3);
+        }
 
-.upload-box.dragover {
-    border-color: #77D42F;
-    background: rgba(119,212,47,0.1);
-}
+        /* TABLE */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
 
+        th, td {
+            padding: 16px 20px;
+            text-align: left;
+            border-bottom: 1px solid #f1f5f9;
+        }
 
-.desc-col{
-    max-width: 250px;          /* batasi lebar */
-    white-space: nowrap;       /* jangan turun baris */
-    overflow: hidden;          
-    text-overflow: ellipsis;   /* munculkan ... */
-}
+        th {
+            background: rgba(248, 250, 252, 0.8);
+            color: var(--text-gray);
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-        </style>
-    </head>
-    <body>
+        td {
+            color: var(--text-dark);
+            font-size: 14.5px;
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #f8fafc;
+        }
+
+        .desc-col {
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-gray);
+        }
+
+        img {
+            width: 55px;
+            height: 55px;
+            object-fit: contain;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 4px;
+        }
+
+        .price-badge {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* ACTION DOTS */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dot-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-gray);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .dot-btn:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            min-width: 150px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            z-index: 50;
+            border: 1px solid #e2e8f0;
+        }
+
+        .dropdown:hover .dropdown-content,
+        .dropdown:focus-within .dropdown-content {
+            display: block;
+            animation: dropFade 0.2s ease;
+        }
+
+        @keyframes dropFade {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dropdown-item {
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            background: none;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-dark);
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .dropdown-item i { width: 16px; height: 16px; }
+        
+        .dropdown-item:hover {
+            background: #f1f5f9;
+            color: var(--accent);
+        }
+        
+        .dropdown-item.delete:hover {
+            color: #ef4444;
+            background: #fef2f2;
+        }
+
+        /* MODAL FULL SCREEN REDESIGN */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--sidebar-bg);
+            width: 100%;
+            max-width: 900px;
+            max-height: 90vh;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            display: flex;
+            flex-direction: column;
+            animation: modalIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-header {
+            padding: 24px 30px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+        }
+
+        .modal-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-gray);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-btn:hover {
+            color: #ef4444;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .modal-body::-webkit-scrollbar { width: 6px; }
+        .modal-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        .modal-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 30px;
+        }
+
+        /* Modern Form Inputs */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-gray);
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            font-size: 15px;
+            color: var(--text-dark);
+            background: var(--bg-color);
+            transition: var(--transition);
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent);
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* Clean Upload Box */
+        .upload-area {
+            height: 100%;
+            min-height: 250px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 20px;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .upload-area i {
+            color: var(--text-gray);
+            transition: var(--transition);
+        }
+
+        .upload-area:hover i {
+            color: var(--accent);
+            transform: translateY(-5px);
+        }
+
+        .upload-area p {
+            color: var(--text-gray);
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        .upload-area span {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        #filePreview, #editFilePreview {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: contain;
+            background: #ffffff;
+            display: none;
+            padding: 10px;
+        }
+
+        .modal-footer {
+            padding: 24px 30px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            background: var(--bg-color);
+        }
+
+        .btn-cancel {
+            background: white;
+            color: var(--text-gray);
+            border: 1px solid #e2e8f0;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-cancel:hover {
+            background: #f1f5f9;
+            color: var(--text-dark);
+        }
+
+        .btn-save {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-save:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(59, 130, 246, 0.3);
+        }
+
+    </style>
+</head>
+<body>
 
     <!-- SIDEBAR -->
     <div class="sidebar">
-        <h2>Ordely</h2>
-<ul>
-    <li><a href="../dashboard.php">Home</a></li>
-
-    <li>
-        <a href="index.php" class="active">
-            Product Management
-        </a>
-    </li>
-
-    <li><a href="../transaksi/index.php">Transactions</a></li>
-    <li><a href="../laporan/index.php">Report</a></li>
-        <?php if($role === 'admin') { ?>
-        <li><a href="../user/index.php">Officer Management</a></li>
-        <li><a href="../backup/backup.php">Backup/Restore</a></li>
-    <?php } ?>
-    <li><a href="../../auth/admin/logout.php">Logout</a></li>
-</ul>
-
+        <h2><i data-lucide="shield-check"></i> Order<span>ly</span></h2>
+        <ul>
+            <li><a href="../dashboard.php"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+            <li><a href="index.php" class="active"><i data-lucide="package"></i> Products</a></li>
+            <li><a href="../transaksi/index.php"><i data-lucide="shopping-cart"></i> Transactions</a></li>
+            <li><a href="../laporan/index.php"><i data-lucide="file-bar-chart"></i> Reports</a></li>
+            <?php if($role === 'admin') { ?>
+                <li><a href="../user/index.php"><i data-lucide="users"></i> Officers</a></li>
+                <li><a href="../backup/backup.php"><i data-lucide="database"></i> Backup</a></li>
+            <?php } ?>
+            <li><a href="../chat_admin.php"><i data-lucide="message-square"></i> Support</a></li>
+            <li><a href="../../auth/admin/logout.php"><i data-lucide="log-out"></i> Logout</a></li>
+        </ul>
     </div>
 
     <!-- CONTENT -->
     <div class="content">
 
         <div class="header">
-            <h2>Product <span>Management</span></h2>
-            <br>
-            <button class="btn btn-add" onclick="openModal()">+ Add New Product</button>
-
+            <h2>Product Directory</h2>
+            <button class="btn-add" onclick="openModal('createModal')">
+                <i data-lucide="plus"></i> Add Product
+            </button>
         </div>
 
         <table>
             <tr>
-                <th>Name Product</th>
+                <th>Product</th>
                 <th>Brand</th>
-                <th class="desc-col">Description</th>
+                <th>Description</th>
                 <th>Price</th>
-                <th>Stocks</th>
-                <th>Size</th> <!-- TAMBAHAN -->
-                <th>Picture</th>
-                <th>Action</th>
+                <th>Stock</th>
+                <th>Sizes</th>
+                <th>Actions</th>
             </tr>
 
             <?php while($row = $result->fetch_assoc()) { ?>
             <tr>
-                <td><?= htmlspecialchars($row['name']) ?></td>
-                <td><?= htmlspecialchars($row['brand']) ?></td>
-                <td class="desc-col" title="<?= htmlspecialchars($row['description']) ?>">
-                 <?= htmlspecialchars($row['description']) ?>
-                </td>
-                <td>Rp <?= number_format($row['price']) ?></td>
-                <td><?= $row['stock'] ?></td>
-                <td><?= $row['size'] ?></td> <!-- TAMBAHAN -->
                 <td>
-                    <?php if($row['image']) { ?>
-                        <img src="../../uploads/products/<?= $row['image'] ?>">
-                    <?php } else { ?>
-                        -
-                    <?php } ?>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <?php if($row['image']) { ?>
+                            <img src="../../uploads/products/<?= htmlspecialchars($row['image']) ?>" alt="Product">
+                        <?php } else { ?>
+                            <div style="width: 55px; height: 55px; background: #f1f5f9; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
+                                <i data-lucide="image"></i>
+                            </div>
+                        <?php } ?>
+                        <span style="font-weight: 600;"><?= htmlspecialchars($row['name']) ?></span>
+                    </div>
                 </td>
-    <td class="actions">
-<button class="dot-btn edit-btn"
-    data-id="<?= $row['id'] ?>"
-    data-name="<?= htmlspecialchars($row['name']) ?>"
-    data-brand="<?= htmlspecialchars($row['brand']) ?>"
-    data-price="<?= $row['price'] ?>"
-    data-stock="<?= $row['stock'] ?>"
-    data-size="<?= $row['size'] ?>"
-    data-description="<?= htmlspecialchars($row['description']) ?>">
-    ⋮
-</button>
-    </td>
-
-
-
+                <td><span style="background:#f1f5f9; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600; color:#64748b;"><?= htmlspecialchars($row['brand']) ?></span></td>
+                <td><div class="desc-col" title="<?= htmlspecialchars($row['description']) ?>"><?= htmlspecialchars($row['description']) ?></div></td>
+                <td class="price-badge">Rp <?= number_format($row['price']) ?></td>
+                <td>
+                    <?php if($row['stock'] > 10): ?>
+                        <span style="color:#10b981; font-weight:600;"><i data-lucide="box" style="width:14px; margin-bottom:-2px;"></i> <?= $row['stock'] ?></span>
+                    <?php else: ?>
+                        <span style="color:#f59e0b; font-weight:600;"><i data-lucide="alert-circle" style="width:14px; margin-bottom:-2px;"></i> <?= $row['stock'] ?></span>
+                    <?php endif; ?>
+                </td>
+                <td><?= htmlspecialchars($row['size']) ?></td>
+                <td>
+                    <div class="dropdown">
+                        <button class="dot-btn"><i data-lucide="more-vertical"></i></button>
+                        <div class="dropdown-content">
+                            <button type="button" class="dropdown-item edit-btn"
+                                data-id="<?= $row['id'] ?>"
+                                data-name="<?= htmlspecialchars($row['name']) ?>"
+                                data-brand="<?= htmlspecialchars($row['brand']) ?>"
+                                data-price="<?= $row['price'] ?>"
+                                data-stock="<?= $row['stock'] ?>"
+                                data-size="<?= htmlspecialchars($row['size']) ?>"
+                                data-description="<?= htmlspecialchars($row['description']) ?>"
+                                data-img="../../uploads/products/<?= htmlspecialchars($row['image']) ?>">
+                                <i data-lucide="edit-2"></i> Edit
+                            </button>
+                            <a href="delete.php?id=<?= $row['id'] ?>" onclick="return confirm('Are you sure you want to delete this product?')" class="dropdown-item delete">
+                                <i data-lucide="trash-2"></i> Delete
+                            </a>
+                        </div>
+                    </div>
+                </td>
             </tr>
             <?php } ?>
         </table>
 
     </div>
 
-    <!-- MODAL -->
-    <div id="productModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-
-        <div class="modal-navbar">
-            <h3>Create</h3>
-        </div>
-
-            <span class="close" onclick="closeModal()">&times;</span>
-
-            <form action="store.php" method="POST" enctype="multipart/form-data">
-        
-        <div class="modal-grid">
+    <!-- CREATE MODAL -->
+    <div id="createModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i data-lucide="package-plus"></i> New Product</h3>
+                <button class="close-btn" onclick="closeModal('createModal')"><i data-lucide="x"></i></button>
+            </div>
             
-            <!-- LEFT SIDE -->
-    <div class="left-form">
-    <div class="form-group">
-        <input type="text" name="name" required>
-        <label>Product Name</label>
-    </div>
+            <form action="store.php" method="POST" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="modal-grid">
+                        
+                        <div class="left-form">
+                            <div class="form-group">
+                                <label>Product Name</label>
+                                <input type="text" name="name" class="form-control" required placeholder="e.g. Nike Air Max">
+                            </div>
 
-    <div class="form-group">
-    <input type="text" name="brand" required>
-    <label>Brand</label>
-</div>
+                            <div class="form-group">
+                                <label>Brand Classification</label>
+                                <input type="text" name="brand" class="form-control" required placeholder="e.g. Nike">
+                            </div>
 
-    <div class="form-group">
-        <input type="number" name="price" required>
-        <label>Price</label>
-    </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div class="form-group">
+                                    <label>Price (Rp)</label>
+                                    <input type="number" name="price" class="form-control" required placeholder="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Stock Quantity</label>
+                                    <input type="number" name="stock" class="form-control" required placeholder="0">
+                                </div>
+                            </div>
 
-    <div class="form-group">
-        <input type="number" name="stock" required>
-        <label>Stock</label>
-    </div>
+                            <div class="form-group">
+                                <label>Available Sizes</label>
+                                <input type="text" name="size" class="form-control" required placeholder="e.g. 40, 41, 42">
+                            </div>
 
-    <div class="form-group">
-    <input type="text" name="size" required>
-    <label>Size (ex: 40,41,42)</label>
-</div>
+                            <div class="form-group">
+                                <label>Full Description</label>
+                                <textarea name="description" class="form-control" required placeholder="Describe the product details and specifications..."></textarea>
+                            </div>
+                        </div>
 
-    <div class="form-group">
-        <textarea name="description" rows="4" required></textarea>
-        <label>Description</label>  
-    </div>
+                        <div class="right-form">
+                            <label style="display:block; font-size:14px; font-weight:600; color:var(--text-gray); margin-bottom:8px;">Product Image</label>
+                            <label class="upload-area" id="uploadArea">
+                                <i data-lucide="image-plus" style="width: 48px; height: 48px;"></i>
+                                <p>Click or drag image here</p>
+                                <span>PNG, JPG up to 5MB</span>
+                                <input type="file" name="image" id="fileElem" hidden required accept="image/*">
+                                <img id="filePreview" alt="Preview">
+                            </label>
+                        </div>
 
-    </div>
-
-
-            <!-- RIGHT SIDE -->
-    <div class="right-form">
-<div class="upload-box" id="drop-area">
-    <p>Drag & Drop Image Here</p>
-    <span>or click to choose file</span>
-    <input type="file" name="image" id="fileElem" hidden required>
-</div>
-
-    </div>
-
-        </div>
-
-    <div class="modal-footer">
-        <button type="submit" class="btn btn-save">Create Product</button>
-    </div>
-
-    </form>
-
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" onclick="closeModal('createModal')">Cancel</button>
+                    <button type="submit" class="btn-save"><i data-lucide="check"></i> Save Product</button>
+                </div>
+            </form>
         </div>
     </div>
 
     <!-- EDIT MODAL -->
     <div id="editModal" class="modal">
-    <div class="modal-content">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i data-lucide="edit"></i> Update Product</h3>
+                <button class="close-btn" onclick="closeModal('editModal')"><i data-lucide="x"></i></button>
+            </div>
+            
+            <form action="update.php" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="id" id="edit_id">
+                
+                <div class="modal-body">
+                    <div class="modal-grid">
+                        
+                        <div class="left-form">
+                            <div class="form-group">
+                                <label>Product Name</label>
+                                <input type="text" name="name" id="edit_name" class="form-control" required>
+                            </div>
 
-        <span class="close" onclick="closeEditModal()">&times;</span>
+                            <div class="form-group">
+                                <label>Brand Classification</label>
+                                <input type="text" name="brand" id="edit_brand" class="form-control" required>
+                            </div>
 
-        <div class="modal-navbar">
-            <h3>Edit Product</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div class="form-group">
+                                    <label>Price (Rp)</label>
+                                    <input type="number" name="price" id="edit_price" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Stock Quantity</label>
+                                    <input type="number" name="stock" id="edit_stock" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Available Sizes</label>
+                                <input type="text" name="size" id="edit_size" class="form-control" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Full Description</label>
+                                <textarea name="description" id="edit_description" class="form-control" required></textarea>
+                            </div>
+                        </div>
+
+                        <div class="right-form">
+                            <label style="display:block; font-size:14px; font-weight:600; color:var(--text-gray); margin-bottom:8px;">Update Image (Optional)</label>
+                            <label class="upload-area" id="editUploadArea">
+                                <i data-lucide="image-plus" style="width: 48px; height: 48px;"></i>
+                                <p>Click to change image</p>
+                                <span>Leave empty to keep existing</span>
+                                <input type="file" name="image" id="editFileElem" hidden accept="image/*">
+                                <img id="editFilePreview" style="display:block;" alt="Preview">
+                            </label>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" onclick="closeModal('editModal')">Cancel</button>
+                    <button type="submit" class="btn-save"><i data-lucide="save"></i> Save Changes</button>
+                </div>
+            </form>
         </div>
-
-    <form action="update.php" method="POST" enctype="multipart/form-data">
-
-    <input type="hidden" name="id" id="edit_id">
-
-    <div class="modal-grid">
-
-    <div class="left-form">
-
-    <div class="form-group">
-        <input type="text" name="name" id="edit_name" required>
-        <label>Product Name</label>
     </div>
 
-    <div class="form-group">
-    <input type="text" name="brand" id="edit_brand" required>
-    <label>Brand</label>
-</div>
-
-    <div class="form-group">
-        <input type="number" name="price" id="edit_price" required>
-        <label>Price</label>
-    </div>
-
-    <div class="form-group">
-        <input type="number" name="stock" id="edit_stock" required>
-        <label>Stock</label>
-    </div>
-
-    <div class="form-group">
-    <input type="text" name="size" id="edit_size" required>
-    <label>Size</label>
-</div>
-
-    <div class="form-group">
-        <textarea name="description" id="edit_description" required></textarea>
-        <label>Description</label>
-    </div>
-
-    </div>
-
-<div class="right-form">
-<div class="upload-box" id="drop-area-edit">
-    <p>Drag & Drop Image Here</p>
-    <span>or click to choose file</span>
-    <input type="file" name="image" id="fileElemEdit" hidden>
-</div>
-</div>
-
-    </div>
-
-    <div class="modal-footer">
-
-    <button type="submit" class="btn btn-save">
-    Update Product
-    </button>
-
-    <button type="button" class="btn btn-delete"
-    onclick="deleteProduct()">
-    Delete Product
-    </button>
-
-    </div>
-
-
-    </form>
-    </div>
-    </div>
-
-
-
-
-    </body>
 
     <script>
-    function openModal() {
-        document.getElementById("productModal").style.display = "block";
-    }
+        lucide.createIcons();
 
-    function closeModal() {
-        document.getElementById("productModal").style.display = "none";
-    }
-
-    window.onclick = function(event) {
-        const modal = document.getElementById("productModal");
-        if (event.target == modal) {
-            modal.style.display = "none";
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
         }
 
-        
-    }
-
-    const textarea = document.querySelector("textarea");
-
-    textarea.addEventListener("input", function () {
-        this.style.height = "auto";
-        this.style.height = this.scrollHeight + "px";
-    });
-
-function openEditModal(id, name, brand, price, stock, size, description) {
-    document.getElementById("edit_id").value = id;
-    document.getElementById("edit_name").value = name;
-    document.getElementById("edit_brand").value = brand;
-    document.getElementById("edit_price").value = price;
-    document.getElementById("edit_stock").value = stock;
-    document.getElementById("edit_size").value = size;
-    document.getElementById("edit_description").value = description;
-
-    document.getElementById("editModal").style.display = "block";
-}
-
-    function closeEditModal() {
-        document.getElementById("editModal").style.display = "none";
-    }
-
-    function deleteProduct() {
-        const id = document.getElementById("edit_id").value;
-
-        if (confirm("Yakin ingin menghapus produk ini?")) {
-            window.location.href = "delete.php?id=" + id;
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
         }
-    }
 
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = "none";
+            }
+        }
 
-// ===== CREATE MODAL DRAG DROP =====
-const dropArea = document.getElementById("drop-area");
-const fileInput = document.getElementById("fileElem");
+        // Image Preview logic
+        function setupImagePreview(inputId, previewId) {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+            
+            input.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
 
-if(dropArea){
-    dropArea.addEventListener("click", () => fileInput.click());
+        setupImagePreview('fileElem', 'filePreview');
+        setupImagePreview('editFileElem', 'editFilePreview');
 
-    dropArea.addEventListener("dragover", e => {
-        e.preventDefault();
-        dropArea.classList.add("dragover");
-    });
+        // Edit Modal Population
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.getElementById('edit_id').value = this.dataset.id;
+                document.getElementById('edit_name').value = this.dataset.name;
+                document.getElementById('edit_brand').value = this.dataset.brand;
+                document.getElementById('edit_price').value = this.dataset.price;
+                document.getElementById('edit_stock').value = this.dataset.stock;
+                document.getElementById('edit_size').value = this.dataset.size;
+                document.getElementById('edit_description').value = this.dataset.description;
+                
+                const imgSrc = this.dataset.img;
+                const preview = document.getElementById('editFilePreview');
+                if(imgSrc && !imgSrc.endsWith('/')) {
+                    preview.src = imgSrc;
+                    preview.style.display = 'block';
+                } else {
+                    preview.style.display = 'none';
+                }
 
-    dropArea.addEventListener("dragleave", () => {
-        dropArea.classList.remove("dragover");
-    });
-
-    dropArea.addEventListener("drop", e => {
-        e.preventDefault();
-        dropArea.classList.remove("dragover");
-        fileInput.files = e.dataTransfer.files;
-        dropArea.querySelector("p").innerText = e.dataTransfer.files[0].name;
-    });
-
-    fileInput.addEventListener("change", () => {
-        dropArea.querySelector("p").innerText = fileInput.files[0].name;
-    });
-}
-
-// ===== EDIT MODAL DRAG DROP =====
-const dropAreaEdit = document.getElementById("drop-area-edit");
-const fileInputEdit = document.getElementById("fileElemEdit");
-
-if(dropAreaEdit){
-    dropAreaEdit.addEventListener("click", () => fileInputEdit.click());
-
-    dropAreaEdit.addEventListener("dragover", e => {
-        e.preventDefault();
-        dropAreaEdit.classList.add("dragover");
-    });
-
-    dropAreaEdit.addEventListener("dragleave", () => {
-        dropAreaEdit.classList.remove("dragover");
-    });
-
-    dropAreaEdit.addEventListener("drop", e => {
-        e.preventDefault();
-        dropAreaEdit.classList.remove("dragover");
-        fileInputEdit.files = e.dataTransfer.files;
-        dropAreaEdit.querySelector("p").innerText = e.dataTransfer.files[0].name;
-    });
-
-    fileInputEdit.addEventListener("change", () => {
-        dropAreaEdit.querySelector("p").innerText = fileInputEdit.files[0].name;
-    });
-}
-
-
-document.querySelectorAll(".edit-btn").forEach(btn => {
-    btn.addEventListener("click", function(){
-
-        document.getElementById("edit_id").value = this.dataset.id;
-        document.getElementById("edit_name").value = this.dataset.name;
-        document.getElementById("edit_brand").value = this.dataset.brand;
-        document.getElementById("edit_price").value = this.dataset.price;
-        document.getElementById("edit_stock").value = this.dataset.stock;
-        document.getElementById("edit_size").value = this.dataset.size;
-        document.getElementById("edit_description").value = this.dataset.description;
-
-        document.getElementById("editModal").style.display = "block";
-    });
-});
-
-
-
-
+                openModal('editModal');
+            });
+        });
     </script>
-
-    </html>
+</body>
+</html>
