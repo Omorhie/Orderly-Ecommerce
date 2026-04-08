@@ -7,6 +7,7 @@ if(!isset($_SESSION['username_user'])){
 }
 
 require_once "../config/database.php";
+require_once "../config/notifications_helper.php";
 
 if(!isset($_GET['order_id'])){
     header("Location: history.php");
@@ -43,6 +44,10 @@ if(isset($_POST['submit'])){
         UPDATE orders SET status='Refund Requested' 
         WHERE id='$order_id'
     ");
+
+    /* ADD NOTIFICATION TO ADMIN */
+    $refund_msg = "Permintaan refund baru masuk dari User ID: $user_id untuk Order #" . str_pad($order_id, 5, '0', STR_PAD_LEFT);
+    add_notification($conn, null, 'refund', $refund_msg);
 
     echo "<script>
         alert('Refund request submitted successfully!');

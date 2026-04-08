@@ -7,7 +7,9 @@ if(!isset($_SESSION['username_user'])){
 }
 
 require_once "../config/database.php";
+require_once "../config/notifications_helper.php";
 $user_id = $_SESSION['user_id'];
+$username_user = $_SESSION['username_user'];
 
 // kirim pesan
 if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message'])){
@@ -18,6 +20,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message'])){
             INSERT INTO chats (user_id, message, sender)
             VALUES ('$user_id', '$msg', 'user')
         ");
+        
+        // Notify admin
+        add_notification($conn, null, 'chat', "Pesan baru dari User (ID: $user_id): $username_user");
     }
     
     // Redirect to prevent form resubmission

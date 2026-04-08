@@ -7,6 +7,7 @@ if (!isset($_SESSION['officer_role'])) {
 }
 
 require_once "../config/database.php";
+require_once "../config/notifications_helper.php";
 
 // ambil semua user yang pernah chat
 $users = $conn->query("
@@ -26,6 +27,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message'])){
             INSERT INTO chats (user_id, message, sender)
             VALUES ('$selected_user', '$msg', 'admin')
         ");
+        add_notification($conn, $selected_user, 'chat', "Pesan baru dari Admin Orderly.");
     }
     header("Location: chat_admin.php?user_id=" . $selected_user);
     exit;
@@ -434,6 +436,21 @@ if($selected_user){
                 }
             });
         }
+    </script>
+
+    <!-- NOTIF LOGIC -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('../api_notif.php')
+            .then(r => r.json())
+            .then(data => {
+                let badge = document.querySelector('.notif-badge');
+                if(badge && data.count > 0) {
+                    badge.style.display = 'inline-block';
+                    badge.textContent = data.count;
+                }
+            }).catch(e=>console.log(e));
+        });
     </script>
 </body>
 </html>

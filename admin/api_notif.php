@@ -1,0 +1,14 @@
+<?php
+session_start();
+header('Content-Type: application/json');
+
+if (!isset($_SESSION['officer_role'])) {
+    echo json_encode(['count' => 0]);
+    exit;
+}
+
+require_once "../config/database.php";
+require_once "../config/notifications_helper.php";
+
+echo json_encode(['count' => get_unread_count($conn, null)]);
+?>

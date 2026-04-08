@@ -536,6 +536,7 @@ $role = $_SESSION['officer_role'];
                 <li><a href="../user/index.php"><i data-lucide="users"></i> Officers</a></li>
                 <li><a href="../backup/backup.php"><i data-lucide="database"></i> Backup</a></li>
             <?php } ?>
+            <li><a href="../notifications.php"><i data-lucide="bell"></i> Notifications <span class="notif-badge" style="background:#ef4444; color:white; font-size:11px; padding:2px 6px; border-radius:10px; margin-left:auto; display:none;">0</span></a></li>
             <li><a href="../chat_admin.php"><i data-lucide="message-square"></i> Support</a></li>
             <li><a href="../../auth/admin/logout.php"><i data-lucide="log-out"></i> Logout</a></li>
         </ul>
@@ -809,6 +810,21 @@ $role = $_SESSION['officer_role'];
 
                 openModal('editModal');
             });
+        });
+    </script>
+
+    <!-- NOTIF LOGIC -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('../api_notif.php')
+            .then(r => r.json())
+            .then(data => {
+                let badge = document.querySelector('.notif-badge');
+                if(badge && data.count > 0) {
+                    badge.style.display = 'inline-block';
+                    badge.textContent = data.count;
+                }
+            }).catch(e=>console.log(e));
         });
     </script>
 </body>

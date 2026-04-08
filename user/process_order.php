@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once "../config/database.php";
+require_once "../config/notifications_helper.php";
 
 if(!isset($_SESSION['user_id'])){
     exit("Harus login sebagai user");
@@ -129,6 +130,12 @@ $stmt->execute();
    HAPUS CART
 ========================= */
 mysqli_query($conn, "DELETE FROM cart WHERE user_id = $user_id");
+
+/* =========================
+   ADD NOTIFICATION
+========================= */
+$order_msg = "Pesanan baru telah masuk! Order ID: #" . str_pad($order_id, 5, '0', STR_PAD_LEFT);
+add_notification($conn, null, 'order', $order_msg);
 
 /* =========================
    REDIRECT

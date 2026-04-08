@@ -494,6 +494,10 @@ $brands = mysqli_query($conn, "SELECT DISTINCT brand FROM products");
                 <a href="cart.php" class="icon-btn" id="cart-icon" title="Cart">
                     <i data-lucide="shopping-cart" style="width: 20px;"></i>
                 </a>
+                <a href="notifications.php" class="icon-btn" title="Notifications" style="position:relative;">
+                    <i data-lucide="bell" style="width: 20px;"></i>
+                    <span class="user-notif-badge" style="position:absolute; top:-2px; right:-2px; background:var(--danger); color:white; font-size:10px; padding:2px 5px; border-radius:50%; display:none; font-weight:bold;">0</span>
+                </a>
                 <a href="chat.php" class="icon-btn" title="Chat">
                     <i data-lucide="message-square" style="width: 20px;"></i>
                 </a>
@@ -683,6 +687,23 @@ $brands = mysqli_query($conn, "SELECT DISTINCT brand FROM products");
         function filterBrand(brand){
             window.location.href = brand === '' ? 'dashboard.php' : 'dashboard.php?brand=' + encodeURIComponent(brand);
         }
+    </script>
+
+    <!-- NOTIF LOGIC USER -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('api_notif.php')
+            .then(r => r.json())
+            .then(data => {
+                let badges = document.querySelectorAll('.user-notif-badge');
+                badges.forEach(b => {
+                    if(data.count > 0) {
+                        b.style.display = 'flex';
+                        b.textContent = data.count;
+                    }
+                });
+            }).catch(e=>console.log(e));
+        });
     </script>
 </body>
 </html>
