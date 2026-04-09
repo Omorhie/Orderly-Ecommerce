@@ -29,6 +29,10 @@ $totalUser = $qUser->fetch_assoc()['total'];
 // total transaksi
 $qTransaksi = $conn->query("SELECT COUNT(*) AS total FROM transactions");
 $totalTransaksi = $qTransaksi->fetch_assoc()['total'];
+
+// total pendapatan (dari order yang Confirmed / selesai)
+$qRevenue = $conn->query("SELECT COALESCE(SUM(total_price), 0) AS total FROM orders WHERE status = 'Confirmed'");
+$totalRevenue = $qRevenue->fetch_assoc()['total'];
 ?>
 
 <?php
@@ -217,6 +221,7 @@ $role = $_SESSION['officer_role'];
         .card-icon.products { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
         .card-icon.users { background: rgba(16, 185, 129, 0.1); color: #10b981; }
         .card-icon.transactions { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+        .card-icon.revenue { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
 
         .card-info {
             display: flex;
@@ -315,6 +320,16 @@ $role = $_SESSION['officer_role'];
                 <div class="card-info">
                     <h3>Total Transactions</h3>
                     <div class="number"><?= $totalTransaksi ?></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon revenue">
+                    <i data-lucide="wallet" style="width: 28px; height: 28px;"></i>
+                </div>
+                <div class="card-info">
+                    <h3>Total Income</h3>
+                    <div class="number" style="font-size: 22px;">Rp <?= number_format($totalRevenue, 0, ',', '.') ?></div>
                 </div>
             </div>
         </div>

@@ -16,7 +16,8 @@ $result = $conn->query("
         orders.method,
         orders.address,
         orders.delivery_status,
-        orders.status
+        orders.status,
+        orders.phone
     FROM transactions
     JOIN users ON transactions.user_id = users.id
     JOIN orders ON transactions.order_id = orders.id
@@ -137,6 +138,13 @@ $role = $_SESSION['officer_role'];
             flex: 1;
             padding: 40px;
             overflow-y: auto;
+            overflow-x: auto;
+        }
+
+        .main-wrapper {
+            display: inline-block;
+            min-width: 100%;
+            vertical-align: top;
         }
 
         .header {
@@ -405,6 +413,7 @@ $role = $_SESSION['officer_role'];
 
 <div class="content">
 
+    <div class="main-wrapper">
     <div class="header">
         <h2>Transactions Overview</h2>
         <a href="refund_control.php" class="btn-refund-control">
@@ -412,24 +421,26 @@ $role = $_SESSION['officer_role'];
         </a>
     </div>
 
-    <table>
-        <tr>
-            <th>Order ID</th>
-            <th>Customer</th>
-            <th>Product</th>
-            <th>Shipping</th>
-            <th>Delivery Track</th>
-            <th>Method</th>
-            <th>Total (Rp)</th>
-            <th>Payment Proof</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
+        <table>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>Product</th>
+                <th>Shipping</th>
+                <th>Delivery Track</th>
+                <th>Method</th>
+                <th>Total (Rp)</th>
+                <th>Payment Proof</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
 
         <?php while($row = $result->fetch_assoc()) { ?>
         <tr>
             <td><span class="order-id">#<?= str_pad($row['order_id'], 5, '0', STR_PAD_LEFT) ?></span></td>
             <td style="font-weight: 500; color: var(--primary);"><?= htmlspecialchars($row['username']) ?></td>
+            <td style="font-weight: 500; color: var(--accent);"><?= htmlspecialchars($row['phone'] ?? '-') ?></td>
             <td><?= htmlspecialchars($row['product_name']) ?></td>
             <td>
                 <?php
@@ -524,6 +535,7 @@ $role = $_SESSION['officer_role'];
         </tr>
         <?php } ?>
     </table>
+    </div>
 
 </div>
 

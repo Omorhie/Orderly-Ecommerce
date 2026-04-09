@@ -30,7 +30,8 @@ $transaction = $conn->query("
         users.username,
         orders.method,
         orders.address,
-        orders.status AS order_status
+        orders.status AS order_status,
+        orders.phone
     FROM transactions
     JOIN users ON transactions.user_id = users.id
     JOIN orders ON transactions.order_id = orders.id
@@ -76,7 +77,19 @@ $role = $_SESSION['officer_role'];
         .sidebar ul li:last-child a:hover { background-color: #ef4444; box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3); }
 
         /* CONTENT */
-        .content { flex: 1; padding: 40px; overflow-y: auto; }
+        .content { 
+            flex: 1; 
+            padding: 40px; 
+            overflow-y: auto; 
+            overflow-x: auto;
+        }
+        
+        .main-wrapper {
+            display: inline-block;
+            min-width: 100%;
+            vertical-align: top;
+        }
+
         .header { display: flex; flex-direction: column; gap: 20px; margin-bottom: 30px; }
         
         .header-top { display: flex; justify-content: space-between; align-items: center; background: var(--sidebar-bg); padding: 20px 30px; border-radius: 20px; box-shadow: var(--card-shadow); }
@@ -179,6 +192,7 @@ $role = $_SESSION['officer_role'];
 
 <!-- CONTENT -->
 <div class="content">
+<div class="main-wrapper">
 
     <div class="header">
         <div class="header-top">
@@ -271,6 +285,7 @@ $role = $_SESSION['officer_role'];
             <tr>
                 <th>Record ID</th>
                 <th>Client Name</th>
+                <th>Phone</th>
                 <th>Target Product</th>
                 <th>Shipping Details</th>
                 <th>Monetary Value</th>
@@ -282,6 +297,7 @@ $role = $_SESSION['officer_role'];
             <tr>
                 <td><span class="hash-id">#TXN-<?= str_pad($row['id'], 4, '0', STR_PAD_LEFT) ?></span></td>
                 <td style="font-weight: 500; color: var(--primary);"><?= htmlspecialchars($row['username']) ?></td>
+                <td style="font-weight: 500; color: var(--accent);"><?= htmlspecialchars($row['phone'] ?? '-') ?></td>
                 <td><?= htmlspecialchars($row['product_name']) ?></td>
                 <td>
                     <?php
@@ -315,6 +331,7 @@ $role = $_SESSION['officer_role'];
         </table>
     </div>
 
+</div>
 </div>
 
 <script>

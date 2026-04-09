@@ -10,9 +10,10 @@ include '../config/database.php';
 
 $user_id = $_SESSION['user_id'];
 
-$userQuery = mysqli_query($conn, "SELECT address FROM users WHERE id = $user_id");
+$userQuery = mysqli_query($conn, "SELECT address, phone FROM users WHERE id = $user_id");
 $userData = mysqli_fetch_assoc($userQuery);
 $address = $userData['address'] ?? '';
+$phone = $userData['phone'] ?? '';
 
 $query = mysqli_query($conn, "
     SELECT cart.*, products.name, products.price, products.image
@@ -686,6 +687,13 @@ $total = 0;
                     <input type="text" name="address" id="address" class="form-control" required 
                            value="<?= htmlspecialchars($address); ?>" 
                            placeholder="Enter your full shipping address">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="text" name="phone" id="phone" class="form-control" required 
+                           value="<?= htmlspecialchars($phone); ?>" 
+                           placeholder="Enter your phone number">
                 </div>
 
                 <!-- SHIPPING DETAILS -->

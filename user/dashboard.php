@@ -13,6 +13,23 @@ if($brandFilter){
 }
 
 $brands = mysqli_query($conn, "SELECT DISTINCT brand FROM products");
+
+// User dashboard stats
+$userStats = ['total_orders' => 0, 'total_spent' => 0, 'active_orders' => 0, 'completed' => 0];
+if ($is_logged_in) {
+    $uid = $_SESSION['user_id'];
+    $qTotal = $conn->query("SELECT COUNT(*) AS c FROM orders WHERE user_id='$uid'");
+    $userStats['total_orders'] = $qTotal->fetch_assoc()['c'];
+
+    $qSpent = $conn->query("SELECT COALESCE(SUM(total_price),0) AS s FROM orders WHERE user_id='$uid' AND status='Confirmed'");
+    $userStats['total_spent'] = $qSpent->fetch_assoc()['s'];
+
+    $qActive = $conn->query("SELECT COUNT(*) AS c FROM orders WHERE user_id='$uid' AND status IN ('Pending','Confirmed') AND (delivery_status IS NULL OR delivery_status != 'Selesai')");
+    $userStats['active_orders'] = $qActive->fetch_assoc()['c'];
+
+    $qDone = $conn->query("SELECT COUNT(*) AS c FROM orders WHERE user_id='$uid' AND delivery_status='Selesai'");
+    $userStats['completed'] = $qDone->fetch_assoc()['c'];
+}
 ?>
 
 <!DOCTYPE html>
@@ -130,18 +147,24 @@ $brands = mysqli_query($conn, "SELECT DISTINCT brand FROM products");
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
 
-        .slides {
-            display: flex;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        .carousel-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            transform: scale(1.03);
         }
 
-        .slides img {
+        .carousel-slide.active {
+            opacity: 1;
+            transform: scale(1);
+            z-index: 2;
+        }
+
+        .carousel-slide img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            flex-shrink: 0;
             object-position: center;
         }
 
@@ -150,21 +173,105 @@ $brands = mysqli_query($conn, "SELECT DISTINCT brand FROM products");
             bottom: 0;
             left: 0;
             width: 100%;
-            padding: 80px 40px 40px;
-            background: linear-gradient(to top, rgba(15, 40, 84, 0.9), transparent);
+            padding: 100px 50px 50px;
+            background: linear-gradient(to top, rgba(15, 40, 84, 0.92), rgba(15, 40, 84, 0.3) 60%, transparent);
             color: var(--white);
+            z-index: 3;
         }
 
         .carousel-overlay h2 {
-            font-size: 2.5rem;
-            margin-bottom: 5px;
+            font-size: 2.8rem;
+            margin-bottom: 8px;
             font-weight: 700;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease 0.2s;
         }
 
         .carousel-overlay p {
             font-size: 1.1rem;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255,255,255,0.85);
             font-weight: 300;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: all 0.6s ease 0.35s;
+            max-width: 600px;
+        }
+
+        .carousel-slide.active .carousel-overlay h2,
+        .carousel-slide.active .carousel-overlay p {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Navigation Arrows */
+        .carousel-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 5;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            color: var(--white);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            opacity: 0;
+        }
+
+        .carousel:hover .carousel-nav {
+            opacity: 1;
+        }
+
+        .carousel-nav:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .carousel-nav.prev { left: 20px; }
+        .carousel-nav.next { right: 20px; }
+
+        /* Dot Indicators */
+        .carousel-dots {
+            position: absolute;
+            bottom: 22px;
+            right: 50px;
+            display: flex;
+            gap: 10px;
+            z-index: 5;
+        }
+
+        .carousel-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 99px;
+            background: rgba(255,255,255,0.35);
+            cursor: pointer;
+            transition: all 0.4s ease;
+            border: none;
+        }
+
+        .carousel-dot.active {
+            width: 32px;
+            background: var(--white);
+        }
+
+        /* Progress Bar */
+        .carousel-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--secondary), #a78bfa);
+            z-index: 5;
+            transition: width 0.1s linear;
+            border-radius: 0 3px 3px 0;
         }
 
         /* BRANDS */
@@ -473,10 +580,78 @@ $brands = mysqli_query($conn, "SELECT DISTINCT brand FROM products");
             font-size: 0.95rem;
         }
 
+        /* USER STATS */
+        .user-stats {
+            width: 90%;
+            margin: 0 auto 40px auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 28px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px -5px rgba(0,0,0,0.1);
+        }
+
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.orders { background: rgba(73, 136, 196, 0.1); color: var(--secondary); }
+        .stat-icon.spent { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+        .stat-icon.active { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+        .stat-icon.done { background: rgba(34, 197, 94, 0.1); color: var(--success); }
+
+        .stat-info h4 {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .stat-info .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+
+        .stat-info .stat-number.money {
+            font-size: 1.15rem;
+        }
+
         @media (max-width: 768px) {
             .carousel { height: 300px; }
-            .carousel-overlay h2 { font-size: 1.8rem; }
+            .carousel-overlay { padding: 60px 30px 35px; }
+            .carousel-overlay h2 { font-size: 1.6rem; }
+            .carousel-overlay p { font-size: 0.95rem; }
+            .carousel-nav { width: 40px; height: 40px; }
+            .carousel-dots { bottom: 16px; right: 30px; }
             .header { font-size: 1.5rem; text-align: center; }
+            .user-stats { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 480px) {
+            .user-stats { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -525,17 +700,81 @@ $brands = mysqli_query($conn, "SELECT DISTINCT brand FROM products");
     </div>
 
     <!-- CAROUSEL -->
-    <div class="carousel">
-        <div class="slides" id="slides">
+    <div class="carousel" id="carousel">
+        <div class="carousel-slide active">
             <img src="../assets/1.jpg" alt="Banner 1">
-            <img src="../assets/2.jpg" alt="Banner 2">
-            <img src="../assets/3.jpg" alt="Banner 3">
+            <div class="carousel-overlay">
+                <h2>Discover Your Style</h2>
+                <p>Premium footwear curated for every lifestyle and occasion.</p>
+            </div>
         </div>
-        <div class="carousel-overlay">
-            <h2>Discover Your Style</h2>
-            <p>Premium Products Just For You</p>
+        <div class="carousel-slide">
+            <img src="../assets/2.jpg" alt="Banner 2">
+            <div class="carousel-overlay">
+                <h2>New Arrivals</h2>
+                <p>Explore the latest drops from Nike, Converse, and more.</p>
+            </div>
+        </div>
+        <div class="carousel-slide">
+            <img src="../assets/3.jpg" alt="Banner 3">
+            <div class="carousel-overlay">
+                <h2>Exclusive Deals</h2>
+                <p>Shop premium quality sneakers at the best prices today.</p>
+            </div>
+        </div>
+
+        <button class="carousel-nav prev" onclick="changeSlide(-1)" aria-label="Previous slide">
+            <i data-lucide="chevron-left" style="width: 22px; height: 22px;"></i>
+        </button>
+        <button class="carousel-nav next" onclick="changeSlide(1)" aria-label="Next slide">
+            <i data-lucide="chevron-right" style="width: 22px; height: 22px;"></i>
+        </button>
+
+        <div class="carousel-dots" id="carouselDots"></div>
+        <div class="carousel-progress" id="carouselProgress"></div>
+    </div>
+
+    <!-- USER STATS -->
+    <?php if($is_logged_in): ?>
+    <div class="user-stats">
+        <div class="stat-card">
+            <div class="stat-icon orders">
+                <i data-lucide="shopping-bag" style="width: 26px; height: 26px;"></i>
+            </div>
+            <div class="stat-info">
+                <h4>My Orders</h4>
+                <div class="stat-number"><?= $userStats['total_orders'] ?></div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon spent">
+                <i data-lucide="wallet" style="width: 26px; height: 26px;"></i>
+            </div>
+            <div class="stat-info">
+                <h4>Total Spent</h4>
+                <div class="stat-number money">Rp <?= number_format($userStats['total_spent'], 0, ',', '.') ?></div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon active">
+                <i data-lucide="loader" style="width: 26px; height: 26px;"></i>
+            </div>
+            <div class="stat-info">
+                <h4>Active Orders</h4>
+                <div class="stat-number"><?= $userStats['active_orders'] ?></div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon done">
+                <i data-lucide="check-circle" style="width: 26px; height: 26px;"></i>
+            </div>
+            <div class="stat-info">
+                <h4>Completed</h4>
+                <div class="stat-number"><?= $userStats['completed'] ?></div>
+            </div>
         </div>
     </div>
+    <?php endif; ?>
 
     <!-- BRANDS -->
     <div class="brand-container">
@@ -670,18 +909,90 @@ $brands = mysqli_query($conn, "SELECT DISTINCT brand FROM products");
             });
         });
 
-        // Carousel Auto Slide
-        const slides = document.getElementById("slides");
-        const totalSlides = slides ? slides.children.length : 0;
-        let index = 0;
+        // Enhanced Carousel
+        const carouselEl = document.getElementById('carousel');
+        const allSlides = carouselEl ? carouselEl.querySelectorAll('.carousel-slide') : [];
+        const dotsContainer = document.getElementById('carouselDots');
+        const progressBar = document.getElementById('carouselProgress');
+        let currentSlide = 0;
+        let autoplayInterval = null;
+        let progressInterval = null;
+        let progressWidth = 0;
+        const SLIDE_DURATION = 5000;
 
-        function nextSlide(){
-            if(totalSlides === 0) return;
-            index++;
-            if(index >= totalSlides) index = 0;
-            slides.style.transform = `translateX(-${index * 100}%)`;
+        // Build dots
+        allSlides.forEach((_, i) => {
+            const dot = document.createElement('button');
+            dot.classList.add('carousel-dot');
+            if (i === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => goToSlide(i));
+            dotsContainer.appendChild(dot);
+        });
+
+        function goToSlide(idx) {
+            allSlides[currentSlide].classList.remove('active');
+            dotsContainer.children[currentSlide].classList.remove('active');
+            currentSlide = idx;
+            allSlides[currentSlide].classList.add('active');
+            dotsContainer.children[currentSlide].classList.add('active');
+            resetProgress();
         }
-        if(totalSlides > 0) setInterval(nextSlide, 4000);
+
+        function changeSlide(dir) {
+            let next = currentSlide + dir;
+            if (next < 0) next = allSlides.length - 1;
+            if (next >= allSlides.length) next = 0;
+            goToSlide(next);
+        }
+
+        function resetProgress() {
+            progressWidth = 0;
+            if (progressBar) progressBar.style.width = '0%';
+            clearInterval(progressInterval);
+            clearInterval(autoplayInterval);
+            startAutoplay();
+        }
+
+        function startAutoplay() {
+            progressInterval = setInterval(() => {
+                progressWidth += (100 / (SLIDE_DURATION / 50));
+                if (progressBar) progressBar.style.width = Math.min(progressWidth, 100) + '%';
+            }, 50);
+            autoplayInterval = setInterval(() => {
+                changeSlide(1);
+            }, SLIDE_DURATION);
+        }
+
+        // Pause on hover
+        if (carouselEl) {
+            carouselEl.addEventListener('mouseenter', () => {
+                clearInterval(autoplayInterval);
+                clearInterval(progressInterval);
+            });
+            carouselEl.addEventListener('mouseleave', () => {
+                startAutoplay();
+            });
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (e.key === 'ArrowRight') changeSlide(1);
+        });
+
+        // Touch swipe support
+        let touchStartX = 0;
+        if (carouselEl) {
+            carouselEl.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+            carouselEl.addEventListener('touchend', (e) => {
+                const diff = touchStartX - e.changedTouches[0].screenX;
+                if (Math.abs(diff) > 50) changeSlide(diff > 0 ? 1 : -1);
+            }, { passive: true });
+        }
+
+        if (allSlides.length > 0) startAutoplay();
 
         // Filter
         function filterBrand(brand){

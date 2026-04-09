@@ -369,9 +369,18 @@ $role = $_SESSION['officer_role'];
             transform: rotate(90deg);
         }
 
+        .modal-content form {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+        }
+
         .modal-body {
             padding: 30px;
             overflow-y: auto;
+            flex: 1;
+            min-height: 0;
         }
 
         .modal-body::-webkit-scrollbar { width: 6px; }

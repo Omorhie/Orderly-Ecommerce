@@ -19,9 +19,11 @@ $id = intval($_GET['id']);
 $stmt = $conn->prepare("
     SELECT 
         transactions.*,
-        users.username
+        users.username,
+        orders.phone
     FROM transactions
     JOIN users ON transactions.user_id = users.id
+    JOIN orders ON transactions.order_id = orders.id
     WHERE transactions.id = ?
 ");
 $stmt->bind_param("i",$id);
@@ -210,6 +212,11 @@ $total = $data['price'] * ($data['qty'] ?? 1);
     <div class="row">
         <span class="label">Customer</span>
         <span class="value"><?= htmlspecialchars($data['username']) ?></span>
+    </div>
+
+    <div class="row">
+        <span class="label">Phone</span>
+        <span class="value"><?= htmlspecialchars($data['phone'] ?? '-') ?></span>
     </div>
 
     <div class="row" style="margin-top: 30px;">

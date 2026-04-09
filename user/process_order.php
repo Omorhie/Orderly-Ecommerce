@@ -53,11 +53,12 @@ $product_name_string = mysqli_real_escape_string(
 /* =========================
    INSERT KE ORDERS
 ========================= */
+$phone = mysqli_real_escape_string($conn, $_POST['phone']);
 mysqli_query($conn, "
     INSERT INTO orders 
-    (user_id, product_name, address, method, total_price, status)
+    (user_id, product_name, phone, address, method, total_price, status)
     VALUES
-    ('$user_id','$product_name_string','$address','$method','$total_price','Pending')
+    ('$user_id','$product_name_string','$phone','$address','$method','$total_price','Pending')
 ");
 
 $order_id = mysqli_insert_id($conn);
