@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 08, 2026 at 09:48 AM
+-- Generation Time: Apr 09, 2026 at 05:19 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -91,7 +91,8 @@ INSERT INTO `chats` (`id`, `user_id`, `message`, `sender`, `created_at`) VALUES
 (18, 2, 'min', 'user', '2026-04-08 06:19:40'),
 (19, 2, '1', 'user', '2026-04-08 06:52:59'),
 (20, 2, 'hi', 'user', '2026-04-08 07:39:21'),
-(21, 2, 'oi', 'admin', '2026-04-08 07:46:12');
+(21, 2, 'oi', 'admin', '2026-04-08 07:46:12'),
+(22, 2, 'hi', 'user', '2026-04-09 02:14:24');
 
 -- --------------------------------------------------------
 
@@ -118,7 +119,11 @@ INSERT INTO `notifications` (`id`, `user_id`, `type`, `message`, `is_read`, `cre
 (3, 2, 'chat', 'Pesan baru dari Admin Orderly.', 1, '2026-04-08 07:46:12'),
 (4, 2, 'delivery', 'Pesanan #00049 telah dikonfirmasi dan sedang dikemas.', 1, '2026-04-08 07:46:44'),
 (5, 2, 'delivery', 'Status pengiriman Order #00049 diperbarui menjadi: Dalam Perjalanan', 1, '2026-04-08 07:47:17'),
-(6, 2, 'delivery', 'Status pengiriman Order #00049 diperbarui menjadi: Selesai', 1, '2026-04-08 07:47:30');
+(6, 2, 'delivery', 'Status pengiriman Order #00049 diperbarui menjadi: Selesai', 1, '2026-04-08 07:47:30'),
+(7, NULL, 'chat', 'Pesan baru dari User (ID: 2): raihan', 1, '2026-04-09 02:14:24'),
+(8, NULL, 'order', 'Pesanan baru telah masuk! Order ID: #00050', 1, '2026-04-09 02:23:45'),
+(9, 2, 'delivery', 'Pesanan #00050 telah dikonfirmasi dan sedang dikemas.', 0, '2026-04-09 02:24:09'),
+(10, NULL, 'order', 'Pesanan baru telah masuk! Order ID: #00051', 1, '2026-04-09 03:10:22');
 
 -- --------------------------------------------------------
 
@@ -156,6 +161,7 @@ CREATE TABLE `orders` (
   `id` int(11) NOT NULL,
   `user_id` int(11) DEFAULT NULL,
   `product_name` varchar(255) DEFAULT NULL,
+  `phone` varchar(20) DEFAULT NULL,
   `order_date` datetime DEFAULT current_timestamp(),
   `address` text DEFAULT NULL,
   `method` varchar(50) DEFAULT NULL,
@@ -168,18 +174,20 @@ CREATE TABLE `orders` (
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`id`, `user_id`, `product_name`, `order_date`, `address`, `method`, `total_price`, `status`, `delivery_status`) VALUES
-(39, 2, 'Star Player 76', '2026-04-08 07:23:53', 'bandung', 'COD', 1299000, 'Refunded', NULL),
-(40, 2, 'CONS Louie Lopez Pro 2 Suede', '2026-04-08 07:28:48', 'bandung', 'COD', 1049300, 'Rejected', NULL),
-(41, 2, 'Nike Air Force 1 \'07', '2026-04-08 07:47:49', 'Depok', 'COD', 1999999, 'Refund Requested', NULL),
-(42, 2, 'Converse Chuck Taylor Throwback', '2026-04-08 08:10:06', 'Depok', 'COD', 1199000, 'Refunded', NULL),
-(43, 2, 'Chuck Taylor All Star', '2026-04-08 10:25:08', 'Depok', 'COD', 899000, 'Confirmed', NULL),
-(44, 2, 'Chuck Taylor All Star', '2026-04-08 11:30:23', 'Depok', 'COD', 899000, 'Rejected', NULL),
-(45, 2, 'Nike Air Force 1 \'07', '2026-04-08 11:39:22', 'Depok', 'COD', 3999998, 'Rejected', NULL),
-(46, 2, 'Nike Air Force 1 \'07', '2026-04-08 13:08:02', 'Depok (Shipping: SiCepat - Express [Rp 35.000])', 'Transfer', 2034999, 'Confirmed', NULL),
-(47, 2, 'Nike Air Force 1 \'07', '2026-04-08 13:17:09', 'Depok (Shipping: JNE - Regular [Rp 15.000])', 'Transfer', 2014999, 'Refunded', NULL),
-(48, 2, 'CONS Louie Lopez Pro 2 Suede', '2026-04-08 13:32:49', 'Depok (Shipping: JNE - Regular [Rp 15.000])', 'COD', 1064300, 'Confirmed', 'Dalam Perjalanan'),
-(49, 2, 'Nike Air Force 1 \'07', '2026-04-08 14:39:54', 'Depok (Shipping: JNE - Express [Rp 35.000])', 'COD', 4034998, 'Confirmed', 'Selesai');
+INSERT INTO `orders` (`id`, `user_id`, `product_name`, `phone`, `order_date`, `address`, `method`, `total_price`, `status`, `delivery_status`) VALUES
+(39, 2, 'Star Player 76', NULL, '2026-04-08 07:23:53', 'bandung', 'COD', 1299000, 'Refunded', NULL),
+(40, 2, 'CONS Louie Lopez Pro 2 Suede', NULL, '2026-04-08 07:28:48', 'bandung', 'COD', 1049300, 'Rejected', NULL),
+(41, 2, 'Nike Air Force 1 \'07', NULL, '2026-04-08 07:47:49', 'Depok', 'COD', 1999999, 'Refunded', NULL),
+(42, 2, 'Converse Chuck Taylor Throwback', NULL, '2026-04-08 08:10:06', 'Depok', 'COD', 1199000, 'Refunded', NULL),
+(43, 2, 'Chuck Taylor All Star', NULL, '2026-04-08 10:25:08', 'Depok', 'COD', 899000, 'Confirmed', NULL),
+(44, 2, 'Chuck Taylor All Star', NULL, '2026-04-08 11:30:23', 'Depok', 'COD', 899000, 'Rejected', NULL),
+(45, 2, 'Nike Air Force 1 \'07', NULL, '2026-04-08 11:39:22', 'Depok', 'COD', 3999998, 'Rejected', NULL),
+(46, 2, 'Nike Air Force 1 \'07', NULL, '2026-04-08 13:08:02', 'Depok (Shipping: SiCepat - Express [Rp 35.000])', 'Transfer', 2034999, 'Confirmed', NULL),
+(47, 2, 'Nike Air Force 1 \'07', NULL, '2026-04-08 13:17:09', 'Depok (Shipping: JNE - Regular [Rp 15.000])', 'Transfer', 2014999, 'Refunded', NULL),
+(48, 2, 'CONS Louie Lopez Pro 2 Suede', NULL, '2026-04-08 13:32:49', 'Depok (Shipping: JNE - Regular [Rp 15.000])', 'COD', 1064300, 'Confirmed', 'Dalam Perjalanan'),
+(49, 2, 'Nike Air Force 1 \'07', NULL, '2026-04-08 14:39:54', 'Depok (Shipping: JNE - Express [Rp 35.000])', 'COD', 4034998, 'Confirmed', 'Selesai'),
+(50, 2, 'Nike Air Force 1 \'07, Chuck Taylor All Star', NULL, '2026-04-09 09:23:45', 'Depok (Shipping: SiCepat - Express [Rp 35.000])', 'COD', 4933996, 'Confirmed', 'Packaging'),
+(51, 2, 'Nike Air Force 1 \'07', '081234567890', '2026-04-09 10:10:22', 'Depok (Shipping: JNE - Regular [Rp 15.000])', 'COD', 2014998, 'Pending', NULL);
 
 -- --------------------------------------------------------
 
@@ -211,8 +219,8 @@ INSERT INTO `products` (`id`, `name`, `brand`, `description`, `price`, `stock`, 
 (19, 'Converse Chuck Taylor Throwback', 'Converse', 'The Converse Chuck Taylor Throwback is a classic sneaker with a vintage style. It features a durable canvas upper, a rubber toe cap, and a comfortable sole for everyday wear.\r\nWith its retro design and timeless look, this shoe is easy to match with any outfit, making it perfect for casual activities and daily use.', 1199000, 90, '41', '1775440796_0888-CONA19787C00W09H-3.webp', '2026-04-06 01:59:56'),
 (20, 'Star Player 76', 'Converse', 'converse', 1299000, 99, '43', '1775530383_0888-CONA21458CIDG09H-1.webp', '2026-04-07 02:53:03'),
 (21, 'CONS Louie Lopez Pro 2 Suede', 'Converse', 'converse', 1049300, 98, '42', '1775530509_0888-CONA14324CIVO09H-1.webp', '2026-04-07 02:55:09'),
-(23, 'Chuck Taylor All Star', 'Converse', 'converse\r\n', 899000, 97, '41', '1775532939_conm7650c-1.webp', '2026-04-07 03:28:15'),
-(25, 'Nike Air Force 1 \'07', 'Nike', 'NIKE\r\n\r\n', 1999999, 92, '41', '1775533293_AIR_FORCE_1__07.jpg', '2026-04-07 03:41:33');
+(23, 'Chuck Taylor All Star', 'Converse', 'converse\r\n', 899000, 96, '41', '1775532939_conm7650c-1.webp', '2026-04-07 03:28:15'),
+(25, 'Nike Air Force 1 \'07', 'Nike', 'NIKE\r\n\r\n', 1999998, 89, '41', '1775533293_AIR_FORCE_1__07.jpg', '2026-04-07 03:41:33');
 
 -- --------------------------------------------------------
 
@@ -234,7 +242,7 @@ CREATE TABLE `refunds` (
 
 INSERT INTO `refunds` (`id`, `order_id`, `reason`, `status`, `created_at`) VALUES
 (1, 42, 'mau ganti\r\n', 'approved', '2026-04-08 01:20:05'),
-(2, 41, 'test', 'pending', '2026-04-08 01:37:12'),
+(2, 41, 'test', 'approved', '2026-04-08 01:37:12'),
 (3, 39, 'mau ganti', 'approved', '2026-04-08 02:34:53'),
 (4, 47, 'mau ganti', 'approved', '2026-04-08 06:18:47');
 
@@ -261,7 +269,10 @@ CREATE TABLE `transactions` (
 
 INSERT INTO `transactions` (`id`, `order_id`, `user_id`, `product_name`, `qty`, `price`, `proof_payment`, `created_at`) VALUES
 (38, 48, 2, 'CONS Louie Lopez Pro 2 Suede', 1, 1049300, '', '2026-04-08 06:32:49'),
-(39, 49, 2, 'Nike Air Force 1 \'07', 2, 3999998, '', '2026-04-08 07:39:54');
+(39, 49, 2, 'Nike Air Force 1 \'07', 2, 3999998, '', '2026-04-08 07:39:54'),
+(40, 50, 2, 'Nike Air Force 1 \'07', 2, 3999996, '', '2026-04-09 02:23:45'),
+(41, 50, 2, 'Chuck Taylor All Star', 1, 899000, '', '2026-04-09 02:23:45'),
+(42, 51, 2, 'Nike Air Force 1 \'07', 1, 1999998, '', '2026-04-09 03:10:22');
 
 -- --------------------------------------------------------
 
@@ -286,7 +297,8 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `username`, `email`, `phone`, `address`, `password`, `created_at`) VALUES
 (1, 'fauzan', 'fauzan@gmail.com', '895 3831 14323', 'cagar alam', '$2y$10$QM1XlscUOdye3Vf3ii2h3eWpA9rLzzNqmsPm17VRjMjdDgsyK90cC', '2026-02-22 14:14:46'),
 (2, 'raihan', 'raihan@gmail.com', '895 3831 14322', 'Depok', '$2y$10$y9ISwxEbfNNcx8gwKeH0Ye3O704Qms0/B8tR5NLkpiYmuryAJBjzq', '2026-02-24 12:38:28'),
-(3, 'vito', 'yazidauff@gmail.com', '431758193681', NULL, '$2y$10$m7ZSjvSJMMCqXUnzy1LVGu3kD.k8FbMXhFV5YarrxewzDpY1ez6n2', '2026-04-03 14:17:56');
+(3, 'vito', 'yazidauff@gmail.com', '431758193681', NULL, '$2y$10$m7ZSjvSJMMCqXUnzy1LVGu3kD.k8FbMXhFV5YarrxewzDpY1ez6n2', '2026-04-03 14:17:56'),
+(6, 'raihan_test', 'raihan_test@test.com', '08123456780', NULL, '$2y$10$mTs38xmbf2RpTbSXerFI/On5ShMytsqP7Z6TTT7TFdyBmVlB0AeBq', '2026-04-09 02:40:11');
 
 --
 -- Indexes for dumped tables
@@ -379,7 +391,7 @@ ALTER TABLE `backups`
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=75;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
 
 --
 -- AUTO_INCREMENT for table `cart_items`
@@ -391,13 +403,13 @@ ALTER TABLE `cart_items`
 -- AUTO_INCREMENT for table `chats`
 --
 ALTER TABLE `chats`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `officer`
@@ -409,7 +421,7 @@ ALTER TABLE `officer`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -427,13 +439,13 @@ ALTER TABLE `refunds`
 -- AUTO_INCREMENT for table `transactions`
 --
 ALTER TABLE `transactions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Constraints for dumped tables
